@@ -1,0 +1,12 @@
+{
+    "development": {
+        "dialect": "sql",
+        "port": "5432",
+        "host": "localhost",
+        "schema": "public",
+        "database": "",
+        "username": "admin",
+        "password": "autoluby",
+        "logging": true
+    }
+}
