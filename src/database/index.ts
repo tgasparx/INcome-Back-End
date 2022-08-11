@@ -118,9 +118,9 @@ export default class Database {
       return false
     }
   }
-  async editCompany({ name, cnpj }: any, token: any) {
+  async editCompany({ name, email,cnpj }: any, token: any) {
     const companyId = await this.getCompanyIdByToken(token)
-    const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, cnpj: cnpj }).where("id = :id", { id: companyId })
+    const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email,cnpj: cnpj }).where("id = :id", { id: companyId })
       .execute()
     return { ok: "OK" } // está aqui////////////////////////
   }
@@ -191,6 +191,11 @@ export default class Database {
       }
       return templateCompanyEmployees
     }
+  }
+  async companyData(token: string){
+    const companyIdByToken = await this.getCompanyIdByToken(token)
+    const data = await myDataSource.getRepository(Companies).findBy({id: Like(`${companyIdByToken}`)})
+    return data[0]
   }
   async createOrder({ status, value, description, client, km, driver }: any, token: string) {
     const companyIdByToken = await this.getCompanyIdByToken(token)

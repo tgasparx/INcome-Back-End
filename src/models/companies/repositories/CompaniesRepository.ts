@@ -14,8 +14,8 @@ async listAllCompanies(){
         const isExistsEmployee = await this.database.createCompany(companyData)
         return isExistsEmployee
     }
-async editCompany({name, cnpj}: any, token: any){
-    const edited = await this.database.editCompany({name, cnpj}, token)
+async editCompany({name, email,cnpj}: any, token: any){
+    const edited = await this.database.editCompany({name, email, cnpj}, token)
     return edited
 
 }
@@ -35,5 +35,9 @@ async listCompanyEmployees(token: string){
 async deleteCompany(token: string, password: string){
     const deleted = await this.database.deleteCompany(token, password)
     return deleted
+}
+async companyData(token: string){
+    const data = await this.database.companyData(token)
+    return data
 }
 }

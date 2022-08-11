@@ -7,8 +7,8 @@ export default class CompanyEditController{
    }
    async handle(request, response){
       const {token} = request.params
-      const {name, cnpj} = request.body
-      const edited = await this.companyEditUseCase.execute({name, cnpj}, token)
+      const {name, email,cnpj} = request.body
+      const edited = await this.companyEditUseCase.execute({name, email, cnpj}, token)
     return response.json(edited)
    }
 }

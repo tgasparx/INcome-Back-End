@@ -3,8 +3,8 @@ export default class CompanyEditUseCase {
     constructor(companiesRepository: any) {
         this.companiesRepository = companiesRepository
     }
-async execute({name, cnpj}: any, token: any){
-    const edited = await this.companiesRepository.editCompany({name, cnpj}, token)
+async execute({name, email,cnpj}: any, token: any){
+    const edited = await this.companiesRepository.editCompany({name, email,cnpj}, token)
     return edited
 
 }
