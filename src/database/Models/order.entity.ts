@@ -10,10 +10,22 @@ export class Order {
     owner_company: string
 
     @Column()
+    description: string
+
+    @Column()
     status: string
 
     @Column()
     value: number
+
+    @Column({nullable: true})
+    km: number
+    
+    @Column({nullable: true})
+    driver: string
+
+    @Column({nullable: true})
+    client: string
 
     @CreateDateColumn()
     created_at: Date

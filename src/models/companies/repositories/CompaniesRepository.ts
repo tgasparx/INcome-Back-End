@@ -1,4 +1,4 @@
-import Database from "../../../database"
+import { stringify } from "querystring"
 
 export default class CompaniesRepository{
     database: any
@@ -14,6 +14,11 @@ async listAllCompanies(){
         const isExistsEmployee = await this.database.createCompany(companyData)
         return isExistsEmployee
     }
+async editCompany({name, cnpj}: any, token: any){
+    const edited = await this.database.editCompany({name, cnpj}, token)
+    return edited
+
+}
 async authCompany({email, password}){
     const auth = await this.database.companyAuth({email, password})
     return auth
@@ -26,5 +31,9 @@ async listCompanyEmployees(token: string){
     console.log(token)
     const employees = await this.database.listCompanyEmployees(token)
     return employees
+}
+async deleteCompany(token: string, password: string){
+    const deleted = await this.database.deleteCompany(token, password)
+    return deleted
 }
 }

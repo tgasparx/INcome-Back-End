@@ -82,10 +82,10 @@ companiesRoutes.post("/orders/create/:token", async function(request, response){
  usersRoutes.post("/memorizedAuth/:token", async function( request, response){
    return response.send(request.params)
  })
- usersRoutes.patch("/edit/:token", async function(request, response){
+ usersRoutes.patch("/edit/:token/:userId", async function(request, response){
     return await userEditController.handle(request,response)
  })
- usersRoutes.delete("/delete/:token", async function(request, response){
+ usersRoutes.delete("/delete/:token/:userId", async function(request, response){
     return await deleteUserController.handle(request,response)
  })
  usersRoutes.get("/summary/:token", async function(request, response){

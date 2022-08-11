@@ -14,6 +14,8 @@ import CompanyDataController from "./CompanyDataController";
 import CompanyDataUseCase from "../useCases/CompanyDataUseCase";
 import ListCompanyEmployeesController from "./ListCompanyEmployeesController";
 import ListCompanyEmployeesUseCase from "../useCases/ListCompanyEmployeesUseCase";
+import DeleteCompanyUseCase from "../useCases/DeleteCompanyUseCase";
+import CompanyEditUseCase from "../useCases/CompanyEditUseCase";
 const database = new Database()
 // START COMPANIES
 const companiesRepository = new CompaniesRepository(database)
@@ -27,8 +29,11 @@ export const listAllCompaniesController = new ListAllCompaniesController(listAll
 const companyAuthUseCase = new CompanyAuthUseCase(companiesRepository)
 export const companyAuthController = new CompanyAuthController(companyAuthUseCase)
 
-export const companyEditController = new CompanyEditController()
-export const deleteCompanyController = new DeleteCompanyController()
+const companyEditUseCase = new CompanyEditUseCase(companiesRepository)
+export const companyEditController = new CompanyEditController(companyEditUseCase)
+
+const deleteCompanyUseCase = new DeleteCompanyUseCase(companiesRepository)
+export const deleteCompanyController = new DeleteCompanyController(deleteCompanyUseCase)
 
 const companySummaryUseCase = new CompanySummaryUseCase(companiesRepository)
 export const companySummaryController = new CompanySummaryController(companySummaryUseCase)

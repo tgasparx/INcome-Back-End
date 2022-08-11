@@ -6,8 +6,8 @@ export default class ExpensesRepository{
         this.database = database
     }
 
-    async createExpense({status, value}: any, token: string){
-        const created = await this.database.createExpense({status, value}, token)
+    async createExpense({status, value, description}: any, token: string){
+        const created = await this.database.createExpense({status, value, description}, token)
         return created
     }
     async listExpenses(token: string){

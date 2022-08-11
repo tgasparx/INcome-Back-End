@@ -10,9 +10,13 @@ export class UserAuth {
     @Column()
     user_name: string
 
-    @OneToOne((type) => Users, auth => UserAuth)
-    @JoinColumn()
-    user: Users
+    // @OneToOne((type) => Users, auth => UserAuth)
+    // @JoinColumn()
+    // user: Users
+
+    @Column()
+    // @JoinColumn()
+    user: string
 
     @UpdateDateColumn()
     last_login: Date

@@ -6,8 +6,8 @@ export default class CreateExpenseUseCase{
         this.expensesRepository = expensesRepository
     }
 
-async execute({status, value}: any, token){
-    const created = this.expensesRepository.createExpense({status, value}, token)
+async execute({status, value, description}: any, token){
+    const created = this.expensesRepository.createExpense({status, value, description}, token)
     return created
 }
 }

@@ -10,6 +10,9 @@ export class Expense {
     owner_company: string
 
     @Column()
+    description: string
+
+    @Column()
     status: string
 
     @Column()

@@ -1,6 +1,10 @@
 export default class ListAllUsersController{
-
+    listAllUsersUseCase: any
+    constructor(listAllUsersUseCase: any){
+        this.listAllUsersUseCase = listAllUsersUseCase
+    }
     async handle(request, response){
-        return response.send("ok")
+        const users = await this.listAllUsersUseCase.execute()
+        return response.json(users)
     }
 }

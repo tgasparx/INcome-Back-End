@@ -7,8 +7,8 @@ export default class OrdersRepository{
     }
 
 
-async createOrder({status, value}: any, token: string){
- const created = await this.database.createOrder({status, value}, token)
+async createOrder({status, value, description, client, km, driver}: any, token: string){
+ const created = await this.database.createOrder({status, value, description, client, km, driver}, token)
  return created
 }
 }
