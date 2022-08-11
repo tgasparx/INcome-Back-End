@@ -6,11 +6,20 @@ import { CompanyAuth } from "./Models/companyAuth.entity";
 import jwt from 'jsonwebtoken'
 import { Like } from "typeorm";
 import { compare, hash } from 'bcrypt'
+import { Order } from "./Models/order.entity";
+import { Expense } from "./Models/expense.entity";
 
 
 export default class Database {
   constructor() {
   }
+  async getCompanyIdByToken(token:string){
+    const referedCompanyIdByToken = await myDataSource.getRepository(CompanyAuth).findBy({ token: Like(`${token}`) })
+    console.log("loggedCompanyId", referedCompanyIdByToken)
+    const companyId = referedCompanyIdByToken[0].company
+    return companyId
+  }
+  getUserIdByToken(){}
   // START COMPANIES
   async listAllCompanies() {
     // const companies = await myDataSource.createQueryBuilder(Companies,"companies").leftJoinAndSelect("auth", "auth").execute()
@@ -27,6 +36,7 @@ export default class Database {
     if (!isCompanyEmailAlreadyExists[0] && !isCompanyCNPJAlreadyExists[0]) {// SE COMPANHIA NÃO EXISTIR NO BANCO DE DADOS
       const hashedPassword = await hash(companyData.company_password, 10)
       const IsOkompanyData = {
+        id: `${(Math.random() * (Math.random()) * 1000)}`,
         name: companyData.company_name,
         email: companyData.company_email,
         password: hashedPassword,
@@ -88,22 +98,107 @@ export default class Database {
   }
   async editCompany() { }
   async deleteCompany() { }
-  async companySummary(){
+  async companySummary(token: string){
+    console.log("token", token)
+    const referedCompanyIdByToken = await myDataSource.getRepository(CompanyAuth).findBy({ token: Like(`${token}`) })
+    console.log("loggedCompanyId", referedCompanyIdByToken)
+    const companyId = referedCompanyIdByToken[0].company
+    console.log("userid", companyId, typeof companyId)
+    const referedCompanyById = await myDataSource.getRepository(Companies).findBy({id: Like(`${companyId}`)})
+    console.log("referedbyId",referedCompanyById[0])
+    const companyOrders = await myDataSource.getRepository(Order).findBy({owner_company: Like(`${companyId}`)})
+    console.log("companyOrders", companyOrders)
+    const companyExpenses = await myDataSource.getRepository(Expense).findBy({owner_company: Like(`${companyId}`)})
+    console.log("companyOrders", companyExpenses)
+
+
     const templateSummary = {
-      page: 1,
-      perPage: 20,
-      total_records: 100,
-      pedidosFinalizadosUltimasDuasSemanas: [],
-      totalDePedidos: 0,
-      totalDePedidosFInalizados: 10,
+      company_name: "",
+      orders_summary: {
+        page: 1,
+        perPage: 20,
+        total_records: 2,
+        all_orders: companyOrders
+      },
+      expenses_summary: {
+        page: 1,
+        perPage: 20,
+        total_records: 2,
+        all_expenses: companyExpenses
+      }
     }
     return templateSummary
+  }
+  async listCompanyEmployees(token: string){
+    const companyId = await this.getCompanyIdByToken(token)
+    console.log(token)
+    const employees = await myDataSource.getRepository(Users).findBy({company: Like(`${companyId}`)})
+    const companyById = await myDataSource.getRepository(Companies).findBy({id: Like(`${companyId}`)})
+    const templateCompanyEmployees = {
+      company_name: companyById[0].name,
+      employees: {
+          page: 1,
+          perPage: 20,
+          total_records: employees.length,
+          all_employees: employees
+      }
+  }
+  return templateCompanyEmployees
+  }
+  async createOrder({status, value}: any, token: string){
+    const companyIdByToken = await this.getCompanyIdByToken(token)
+    const newOrder = {
+      order_id: `${(Math.random() * (Math.random()) * 1000)}`,
+      owner_company: companyIdByToken,
+      status: status,
+      value: parseInt(value),
+    }
+    const create = await myDataSource.getRepository(Order).create(newOrder)
+    const created = await myDataSource.getRepository(Order).save(create)
+
+    return created
+  }
+  async createExpense({status, value}: any, token: string){
+    const companyIdByToken = await this.getCompanyIdByToken(token)
+    const newExpense = {
+      expense_id: `${(Math.random() * (Math.random()) * 1000)}`,
+      owner_company: companyIdByToken,
+      status: status,
+      value: parseInt(value),
+    }
+    const create = await myDataSource.getRepository(Expense).create(newExpense)
+    const created = await myDataSource.getRepository(Expense).save(create)
+    return created
+
   }
 
   // END COMPANIES
   // START USERS
-  async listAllUsers() { }
-  async createUser() { }
+  async listAllUsers(token: string) { 
+    // const users = await
+
+      
+  }
+  async createUser({name, email, password, cpf}: any, token: string) { 
+    const companyId = await this.getCompanyIdByToken(token)
+    const hashedPassword = await hash(password, 10)
+    const isOkUserData = {
+      id: `${(Math.random() * (Math.random()) * 1000)}`,
+      name,
+      email,
+      password: hashedPassword,
+      company: companyId,
+      cpf
+    }
+  try {
+    const create = await myDataSource.getRepository(Users).create(isOkUserData)
+    const created = await myDataSource.getRepository(Users).save(create)
+    return created
+  } catch (error) {
+    console.log(error)
+    return {error: "Funcionário já cadastrado"}
+  }
+  }
   async editUser() { }
   async deleteUser() { }
   async userAuth() { }

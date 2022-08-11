@@ -1,15 +1,19 @@
 import CompaniesRepository from "../repositories/CompaniesRepository";
 import CreateNewCompanyController from "./CreateNewCompanyController";
 import ListAllCompaniesController from "./ListAllCompaniesController";
-import CreateNewCompanyUseCase from "./useCases/CreateNewCompanyUseCase";
-import ListAllCompaniesUseCase from "./useCases/ListAllCompaniesUseCase";
+import CreateNewCompanyUseCase from "../useCases/CreateNewCompanyUseCase";
+import ListAllCompaniesUseCase from "../useCases/ListAllCompaniesUseCase";
 import Database from "../../../database";
 import CompanyAuthController from "./CompanyAuthController";
-import CompanyAuthUseCase from "./useCases/CompanyAuthUseCase";
+import CompanyAuthUseCase from "../useCases/CompanyAuthUseCase";
 import CompanyEditController from "./CompanyEditController";
 import DeleteCompanyController from "./DeleteCompanyController";
 import CompanySummaryController from "./CompanySummaryController";
-import CompanySummaryUseCase from "./useCases/CompanySummaryUseCase";
+import CompanySummaryUseCase from "../useCases/CompanySummaryUseCase";
+import CompanyDataController from "./CompanyDataController";
+import CompanyDataUseCase from "../useCases/CompanyDataUseCase";
+import ListCompanyEmployeesController from "./ListCompanyEmployeesController";
+import ListCompanyEmployeesUseCase from "../useCases/ListCompanyEmployeesUseCase";
 const database = new Database()
 // START COMPANIES
 const companiesRepository = new CompaniesRepository(database)
@@ -28,4 +32,10 @@ export const deleteCompanyController = new DeleteCompanyController()
 
 const companySummaryUseCase = new CompanySummaryUseCase(companiesRepository)
 export const companySummaryController = new CompanySummaryController(companySummaryUseCase)
+
+const companyDataUseCase = new CompanyDataUseCase(companiesRepository)
+export const companyDataController = new CompanyDataController(companyDataUseCase)
+
+const listCompanyEmployeesUseCase = new ListCompanyEmployeesUseCase(companiesRepository)
+export const listCompanyEmployeesController = new ListCompanyEmployeesController(listCompanyEmployeesUseCase)
 // END COMPANIES

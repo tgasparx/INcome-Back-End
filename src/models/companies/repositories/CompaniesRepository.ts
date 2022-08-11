@@ -18,8 +18,13 @@ async authCompany({email, password}){
     const auth = await this.database.companyAuth({email, password})
     return auth
 }
-async companySummary(){
-    const summary = await this.database.companySummary()
+async companySummary(token: string){
+    const summary = await this.database.companySummary(token)
     return summary
+}
+async listCompanyEmployees(token: string){
+    console.log(token)
+    const employees = await this.database.listCompanyEmployees(token)
+    return employees
 }
 }

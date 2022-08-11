@@ -12,8 +12,8 @@ constructor(database: any){
         const allCompanies = await this.database.listAllCompanies()
         return allCompanies
     }
-       async createUser(companyData){
-            const isExistsEmployee = await this.database.createCompany(companyData)
+       async createUser({name, email, password, cpf}: any, token: string){
+            const isExistsEmployee = await this.database.createUser({name, email, password, cpf}, token)
             return isExistsEmployee
         }
     async authUser({email, password}){

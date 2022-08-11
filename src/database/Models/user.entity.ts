@@ -5,7 +5,7 @@ import { UserAuth } from "./UserAuth.entity"
 
 @Entity()
 export class Users {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn()
     id: string
 
     @Column()
@@ -15,6 +15,11 @@ export class Users {
         unique: true
     })
     email: string
+
+    @Column({
+        unique: true
+    })
+    cpf: string
 
     @Column()
     password: string
@@ -28,9 +33,10 @@ export class Users {
     @OneToOne((type) => UserAuth, user => Users)
     auth: UserAuth
 
-    @ManyToOne((type) => Companies, users => Users)
-    @JoinColumn()
-    company: Companies
+    // @ManyToOne((type) => Companies, users => Users)
+    // @JoinColumn()
+    @Column()
+    company: string
 
 
 }
