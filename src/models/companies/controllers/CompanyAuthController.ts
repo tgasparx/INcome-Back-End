@@ -9,9 +9,11 @@ export default class CompanyAuthController{
         const {email, password} = request.body
         const auth = await this.companyAuthUseCase.execute({email, password})
         if(auth){
-        return response.status(200).json(auth)
+            response.status(200)
+        return response.json(auth)
         }else{
-            return response.status(406).send()
+           throw new Error("Usuário ou senha incorretos");
+           
         }
 
     }

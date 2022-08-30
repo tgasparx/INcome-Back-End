@@ -40,4 +40,8 @@ async companyData(token: string){
     const data = await this.database.companyData(token)
     return data
 }
+async changePassword({password, newPassword}: any, token: string): Promise<boolean>{
+    const changed = await this.database.changePassword({password, newPassword}, token)
+    return changed
+}
 }

@@ -3,7 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { companiesRoutes } from './routes/companies.routes'
 import { usersRoutes } from './routes/users.routes'
-import { companyAuthController, companyDataController, companyEditController, companySummaryController, createNewCompanyController, deleteCompanyController, listAllCompaniesController, listCompanyEmployeesController } from './models/companies/controllers'
+import { changePasswordController, companyAuthController, companyDataController, companyEditController, companySummaryController, createNewCompanyController, deleteCompanyController, listAllCompaniesController, listCompanyEmployeesController } from './models/companies/controllers'
 import { myDataSource } from './database/config/app-data-source'
 import {Users } from './database/Models/user.entity'
 import { Companies } from './database/Models/company.entity'
@@ -68,6 +68,14 @@ companiesRoutes.post("/expenses/create/:token", async function (request, respons
 companiesRoutes.post("/orders/create/:token", async function(request, response){
    return await createOrderController.handle(request, response)
 })
+
+companiesRoutes.put("/changePassword/:token", async function(request, response){
+   return await changePasswordController.handle(request, response)
+})
+
+
+
+
 
  usersRoutes.get("/list", async function (request, response){
     return await listAllUsersController.handle(request,response)

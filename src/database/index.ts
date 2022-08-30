@@ -120,8 +120,28 @@ export default class Database {
   }
   async editCompany({ name, email,cnpj }: any, token: any) {
     const companyId = await this.getCompanyIdByToken(token)
-    const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email,cnpj: cnpj }).where("id = :id", { id: companyId })
+    const isCnpjAlreadyExists = await myDataSource.getRepository(Companies).findBy({cnpj: Like(`${cnpj}`)})
+    const isEmailAlreadyExists = await myDataSource.getRepository(Companies).findBy({email: Like(`${email}`)})
+    console.log("isalreadyexists",isCnpjAlreadyExists)
+    if(!isCnpjAlreadyExists[0] && !isEmailAlreadyExists[0]){
+      const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email,cnpj: cnpj }).where("id = :id", { id: companyId })
       .execute()
+    }else{
+      if(isEmailAlreadyExists[0] && !isCnpjAlreadyExists[0]){
+        const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, cnpj: cnpj }).where("id = :id", { id: companyId })
+        .execute()
+      }
+      if(isCnpjAlreadyExists[0] && !isEmailAlreadyExists[0]){
+        const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email }).where("id = :id", { id: companyId })
+        .execute()
+      }
+      if(isCnpjAlreadyExists[0] && isEmailAlreadyExists[0]){
+        const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name }).where("id = :id", { id: companyId })
+        .execute()
+      }
+    
+    }
+   
     return { ok: "OK" } // está aqui////////////////////////
   }
   async deleteCompany(token: string, password: string) {
@@ -231,6 +251,18 @@ export default class Database {
     const created = await myDataSource.getRepository(Expense).save(create)
     return created
 
+  }
+  async changePassword({password, newPassword}: any, token: string): Promise<boolean>{
+    const companyIdByToken = await this.getCompanyIdByToken(token)
+    const company = await myDataSource.getRepository(Companies).findBy({id: Like(`${companyIdByToken}`)})
+    const isTrueUser = await compare(password, company[0].password)
+    if(isTrueUser){
+      const newHash = await hash(newPassword, 10)
+      const changed = myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({password: newHash}).where("id = :id", { id: companyIdByToken })
+      .execute()
+      return true
+    }
+    return false
   }
   // END COMPANIES
   // START USERS

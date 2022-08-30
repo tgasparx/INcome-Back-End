@@ -16,6 +16,8 @@ import ListCompanyEmployeesController from "./ListCompanyEmployeesController";
 import ListCompanyEmployeesUseCase from "../useCases/ListCompanyEmployeesUseCase";
 import DeleteCompanyUseCase from "../useCases/DeleteCompanyUseCase";
 import CompanyEditUseCase from "../useCases/CompanyEditUseCase";
+import ChangePasswordController from "./ChangePasswordController";
+import ChangePasswordUseCase from "../useCases/ChangePasswordUseCase";
 const database = new Database()
 // START COMPANIES
 const companiesRepository = new CompaniesRepository(database)
@@ -43,4 +45,7 @@ export const companyDataController = new CompanyDataController(companyDataUseCas
 
 const listCompanyEmployeesUseCase = new ListCompanyEmployeesUseCase(companiesRepository)
 export const listCompanyEmployeesController = new ListCompanyEmployeesController(listCompanyEmployeesUseCase)
+
+const changePasswordUseCase = new ChangePasswordUseCase(companiesRepository)
+export const changePasswordController = new ChangePasswordController(changePasswordUseCase)
 // END COMPANIES
