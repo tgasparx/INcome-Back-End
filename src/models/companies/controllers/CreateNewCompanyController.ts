@@ -23,12 +23,11 @@ export default class CreateNewCompanyController {
             company_password,
             company_cnpj,
         }
-        console.log(companyData)
         const created = await this.createNewCompanyUseCase.execute(companyData)
         if(created){
             return response.status(201).send("Compania criada com sucesso")///////////////////////////////////////
         }else{
-            return response.status(406).send("Erro")
+            return response.status(406).send("Erro, email ou CNPJ já cadastrados")
         }
         
     }

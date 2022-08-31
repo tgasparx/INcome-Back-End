@@ -5,7 +5,8 @@ export default class ListOrdersUseCase{
     constructor(ordersRepository){
         this.ordersRepository = ordersRepository
     }
-    async execute(){
-        
+    async execute(token:string){
+        const orders = await this.ordersRepository.listOrders(token)
+        return orders
     }
 }

@@ -1,9 +1,14 @@
 
 
 export default class ListExpensesController{
-    constructor(){}
+    listExpensesUseCase
+    constructor(listExpensesUseCase: any){
+        this.listExpensesUseCase = listExpensesUseCase
+    }
 
     async handle(request, response){
-        return response.send("OK")
+        const {token} = request.params
+        const list = await this.listExpensesUseCase.execute(token)
+        return response.json(list)
     }
 }

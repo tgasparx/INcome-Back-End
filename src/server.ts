@@ -8,10 +8,11 @@ import { myDataSource } from './database/config/app-data-source'
 import {Users } from './database/Models/user.entity'
 import { Companies } from './database/Models/company.entity'
 import { createNewUserController, deleteUserController, listAllUsersController, userAuthController, userDataController, userEditController, userSummaryController } from './models/users/controllers'
-import { createExpenseController, listExpensesController } from './models/expenses/controllers'
+import { createExpenseController, deleteExpenseController, editExpensesController, listExpensesController } from './models/expenses/controllers'
 import CreateExpenseController from './models/expenses/controllers/CreateExpenseController'
-import { createOrderController, editOrderController, listOrdersController } from './models/orders/controllers'
+import { createOrderController, deleteOrderController, editOrderController, listOrdersController } from './models/orders/controllers'
 import { ordersRoutes } from './routes/orders.routes'
+import { expensesRoutes } from './routes/expenses.routes'
 //END IMPORT
 //START CONFIG
 
@@ -29,6 +30,7 @@ app.use(express.json())
 app.use("/companies",companiesRoutes)
 app.use("/users", usersRoutes)
 app.use("/orders", ordersRoutes)
+app.use("/expenses", expensesRoutes)
 
 
 
@@ -60,18 +62,6 @@ companiesRoutes.get("/data/:token", async function (request, response){
 })
 companiesRoutes.get("/employees/:token", async function (request, response){
    return await listCompanyEmployeesController.handle(request,response)
-})
-// companiesRoutes.get("/expenses/list/:token", async function(request, response){
-//    return await listExpensesController.handle(request, response)
-// })
-companiesRoutes.post("/expenses/create/:token", async function (request, response){
-   return await createExpenseController.handle(request,response)
-})
-companiesRoutes.post("/orders/create/:token", async function(request, response){
-   return await createOrderController.handle(request, response)
-})
-companiesRoutes.patch("/orders/edit/:token", async function( request, response){
-   return await editOrderController.handle(request, response)
 })
 companiesRoutes.put("/changePassword/:token", async function(request, response){
    return await changePasswordController.handle(request, response)
@@ -110,6 +100,24 @@ companiesRoutes.put("/changePassword/:token", async function(request, response){
 
  ordersRoutes.get("/list/:token", async function (request, response){
    return await listOrdersController.handle(request, response)
+ })
+ ordersRoutes.patch("/edit/:token", async function(request, response){
+   return await editOrderController.handle(request, response)
+ })
+ ordersRoutes.delete("/delete/:token", async function (request, response){
+   return await deleteOrderController.handle(request, response)
+ })
+
+
+ 
+ expensesRoutes.get("/list/:token", async function (request, response) {
+   return await listExpensesController.handle(request,response)
+ })
+ expensesRoutes.patch("/edit/:token", async function (request, response){
+   return await editExpensesController.handle(request, response)
+ })
+ expensesRoutes.delete("/delete/:token", async function (request, response){
+   return await deleteExpenseController.handle(request,response)
  })
 //END ROUTES
 

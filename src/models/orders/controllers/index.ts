@@ -1,9 +1,11 @@
 import Database from "../../../database";
 import OrdersRepository from "../repositories/OrdersRepository";
 import CreateOrderUseCase from "../useCases/CreateOrderUseCase";
+import DeleteOrderUseCase from "../useCases/DeleteOrderUseCase";
 import EditOrderUseCase from "../useCases/EditOrderUseCase";
 import ListOrdersUseCase from "../useCases/ListOrdersUseCase";
 import CreateOrderController from "./CreateOrderController";
+import DeleteOrderController from "./DeleteOrderController";
 import EditOrderController from "./EditOrderController";
 import ListOrdersController from "./ListOrdersController";
 
@@ -18,3 +20,6 @@ export const listOrdersController = new ListOrdersController(listOrdersUseCase)
 
  const editOrderUseCase = new EditOrderUseCase(ordersRepository)
  export const editOrderController = new EditOrderController(editOrderUseCase)
+
+const deleteOrderUseCase = new DeleteOrderUseCase(ordersRepository)
+ export const deleteOrderController = new DeleteOrderController(deleteOrderUseCase)

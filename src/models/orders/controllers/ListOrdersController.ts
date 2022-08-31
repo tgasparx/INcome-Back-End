@@ -7,6 +7,8 @@ export default class ListOrdersController{
         this.listOrdersUseCase = listOrdersUseCase
     }
     async handle(request, response){
-        return response.json({ok: "ok"})
+        const {token} = request.params
+        const list = await this.listOrdersUseCase.execute(token)
+        return response.json(list)
     }
 }

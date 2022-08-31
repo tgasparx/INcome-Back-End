@@ -15,4 +15,12 @@ async editOrder({description, value, status, driver, km}: any, orderId: string, 
     const edited = await this.database.editOrder({description, value, status, driver, km}, orderId, token)
     return edited
 }
+async listOrders(token:string){
+    const orders = await this.database.listOrders(token)
+    return orders
+}
+async deleteOrder(orderId: string, token: string){
+    const deleted = await this.database.deleteOrder(orderId, token)
+    return deleted
+}
 }
