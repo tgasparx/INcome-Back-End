@@ -6,7 +6,7 @@
         "schema": "public",
         "database": "income",
         "username": "admin",
-        "password": "autoluby",
+        "password": "123",
         "logging": true
     }
 }
