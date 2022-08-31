@@ -1,11 +1,14 @@
+import { Response, Request } from "express"
+import IChangePasswordUseCase from "../useCases/IChangePasswordUseCase"
+import IChangePasswordController from "./IChangePasswordController"
 
 
-export default class ChangePasswordController{
-    changePasswordUseCase: any
-    constructor(changePasswordUseCase: any){
+export default class ChangePasswordController implements IChangePasswordController{
+    changePasswordUseCase: IChangePasswordUseCase
+    constructor(changePasswordUseCase: IChangePasswordUseCase){
         this.changePasswordUseCase = changePasswordUseCase
     }
-    async handle(request, response){
+    async handle(request: Request, response: Response): Promise<Response>{
         const {password, newPassword} = request.body
         const {token} = request.params
         const changed = await this.changePasswordUseCase.execute({password, newPassword}, token)

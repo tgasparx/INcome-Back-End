@@ -1,8 +1,9 @@
+import IExpensesRepository from "../repositories/IExpensesRepository"
 
 
 export default class CreateExpenseUseCase{
-    expensesRepository: any
-    constructor(expensesRepository: any){
+    expensesRepository: IExpensesRepository
+    constructor(expensesRepository: IExpensesRepository){
         this.expensesRepository = expensesRepository
     }
 

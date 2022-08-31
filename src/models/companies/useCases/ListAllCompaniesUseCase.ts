@@ -1,9 +1,10 @@
+import { ICompaniesRepository } from "../repositories/ICompaniesRepository"
 
 
 
 export default class ListAllCompaniesUseCase {
-    companiesRepository: any
-    constructor(companiesRepository: any) {
+    companiesRepository: ICompaniesRepository
+    constructor(companiesRepository: ICompaniesRepository) {
         this.companiesRepository = companiesRepository
     }
 

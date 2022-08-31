@@ -1,9 +1,13 @@
-export default class CompanyDataUseCase{
-    companiesRepository: any
-constructor(companiesRepository: any){
+import ICompany from "../models/ICompany"
+import { ICompaniesRepository } from "../repositories/ICompaniesRepository"
+import ICompanyDataUseCase from "./ICompanyDataUseCase"
+
+export default class CompanyDataUseCase implements ICompanyDataUseCase{
+    companiesRepository: ICompaniesRepository
+constructor(companiesRepository: ICompaniesRepository){
     this.companiesRepository = companiesRepository
 }
-async execute(token: string){
+async execute(token: string): Promise<ICompany>{
   const data = await this.companiesRepository.companyData(token)
     return data
 }

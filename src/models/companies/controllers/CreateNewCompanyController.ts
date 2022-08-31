@@ -1,14 +1,16 @@
 import { Request, Response } from "express"
+import ICreateNewCompanyUseCase from "../useCases/ICreateNewCompanyUseCase"
+import ICreateNewCompanyController from "./ICreateNewCompanyController"
 
 
 
-export default class CreateNewCompanyController {
-    createNewCompanyUseCase: any
-    constructor(createNewCompanyUseCase: any) {
+export default class CreateNewCompanyController implements ICreateNewCompanyController{
+    createNewCompanyUseCase: ICreateNewCompanyUseCase
+    constructor(createNewCompanyUseCase: ICreateNewCompanyUseCase) {
         this.createNewCompanyUseCase = createNewCompanyUseCase
     }
 
-    async handle(request: Request, response: Response) {
+    async handle(request: Request, response: Response): Promise<Response> {
         const {
         
             company_name,

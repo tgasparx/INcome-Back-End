@@ -1,13 +1,16 @@
+import { Request, Response } from "express"
+import ICompanySummaryUseCase from "../useCases/ICompanySummaryUseCase"
+import ICompanySummaryController from "./ICompanySummaryController"
 
 
-export default class CompanySummaryController{
-    companySummaryUseCase: any
-    constructor(companySummaryUseCase){
-this.companySummaryUseCase = companySummaryUseCase
+export default class CompanySummaryController implements ICompanySummaryController {
+    companySummaryUseCase: ICompanySummaryUseCase
+    constructor(companySummaryUseCase: ICompanySummaryUseCase) {
+        this.companySummaryUseCase = companySummaryUseCase
     }
-    async handle(request, response){
-        const {token} = request.params
+    async handle(request: Request, response: Response) {
+        const { token } = request.params
         const summary = await this.companySummaryUseCase.execute(token)
-        return response.json(summary) 
+        return response.json(summary)
     }
 }

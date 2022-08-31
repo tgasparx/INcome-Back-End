@@ -1,14 +1,15 @@
 import Database from "../../../database"
 import IExpenseData from "../models/IExpenseData"
+import IExpensesRepository from "./IExpensesRepository"
 
 
-export default class ExpensesRepository{
+export default class ExpensesRepository implements IExpensesRepository{
     database: Database
     constructor(database: Database){
         this.database = database
     }
 
-    async createExpense({description, value, status}: IExpenseData, token: string){
+    async createExpense({description, value, status}: IExpenseData, token: string): Promise<boolean>{
         const created = await this.database.createExpense({status, value, description}, token)
         return created
     }

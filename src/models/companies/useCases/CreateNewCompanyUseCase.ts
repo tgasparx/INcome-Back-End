@@ -1,7 +1,8 @@
+import ICreateNewCompanyUseCase from "./ICreateNewCompanyUseCase"
 
 
 
-export default class CreateNewCompanyUseCase {
+export default class CreateNewCompanyUseCase  implements ICreateNewCompanyUseCase{
     companiesRepository: any
     constructor(companiesRepository: any) {
         this.companiesRepository = companiesRepository

@@ -1,5 +1,5 @@
 //START IMPORT
-import express from 'express'
+import express, {Request, Response} from 'express'
 import cors from 'cors'
 import { companiesRoutes } from './routes/companies.routes'
 import { usersRoutes } from './routes/users.routes'
@@ -15,7 +15,6 @@ import { ordersRoutes } from './routes/orders.routes'
 import { expensesRoutes } from './routes/expenses.routes'
 //END IMPORT
 //START CONFIG
-
 const app = express()
 app.use(cors())
 myDataSource
@@ -31,94 +30,91 @@ app.use("/companies",companiesRoutes)
 app.use("/users", usersRoutes)
 app.use("/orders", ordersRoutes)
 app.use("/expenses", expensesRoutes)
-
-
-
 //END CONFIG
 //START ROUTES
          // START COMPANIES
-companiesRoutes.get("/list", async function(request, response) {
+companiesRoutes.get("/list", async function(request: Request, response: Response): Promise<Response> {
     return await listAllCompaniesController.handle(request, response)
 })
-companiesRoutes.post("/create", async function (request, response) {
+companiesRoutes.post("/create", async function (request: Request, response: Response): Promise<Response> {
    return await createNewCompanyController.handle(request, response) 
 })
-companiesRoutes.post("/auth", async function (request, response) {
+companiesRoutes.post("/auth", async function (request: Request, response: Response): Promise<Response> {
     return await companyAuthController.handle(request, response) 
  })
- companiesRoutes.post("/memorizedAuth/:token", async function(request, response){
+ companiesRoutes.post("/memorizedAuth/:token", async function(request: Request, response: Response): Promise<Response>{
    return response.send(request.params)
  })
- companiesRoutes.patch("/edit/:token", async function (request, response){
+ companiesRoutes.patch("/edit/:token", async function (request: Request, response: Response): Promise<Response>{
     return await companyEditController.handle(request,response)
  })
- companiesRoutes.delete("/delete/:token", async function (request, response){
+ companiesRoutes.delete("/delete/:token", async function (request: Request, response: Response): Promise<Response>{
     return await deleteCompanyController.handle(request,response)
  })
-companiesRoutes.get("/summary/:token", async function (request, response){
+companiesRoutes.get("/summary/:token", async function (request: Request, response: Response): Promise<Response>{
     return await companySummaryController.handle(request, response)
 })
-companiesRoutes.get("/data/:token", async function (request, response){
+companiesRoutes.get("/data/:token", async function (request: Request, response: Response): Promise<Response>{
    return await companyDataController.handle(request, response)
 })
-companiesRoutes.get("/employees/:token", async function (request, response){
+companiesRoutes.get("/employees/:token", async function (request: Request, response: Response): Promise<Response>{
    return await listCompanyEmployeesController.handle(request,response)
 })
-companiesRoutes.put("/changePassword/:token", async function(request, response){
+companiesRoutes.put("/changePassword/:token", async function(request: Request, response: Response): Promise<Response>{
    return await changePasswordController.handle(request, response)
 })
          //END COMPANIES
          // START USERS
- usersRoutes.get("/list", async function (request, response){
+ usersRoutes.get("/list", async function (request: Request, response: Response): Promise<Response>{
     return await listAllUsersController.handle(request,response)
  })
- usersRoutes.post("/create/:token", async function(request, response){
+ usersRoutes.post("/create/:token", async function(request: Request, response: Response): Promise<Response>{
     return await createNewUserController.handle(request, response)
  })
- usersRoutes.post("/auth", async function(request, response){
+ usersRoutes.post("/auth", async function(request: Request, response: Response): Promise<Response>{
     return await userAuthController.handle(request,response)
  })
- usersRoutes.post("/memorizedAuth/:token", async function( request, response){
+ usersRoutes.post("/memorizedAuth/:token", async function(request: Request, response: Response): Promise<Response>{
    return response.send(request.params)
  })
- usersRoutes.patch("/edit/:token/:userId", async function(request, response){
+ usersRoutes.patch("/edit/:token/:userId", async function(request: Request, response: Response): Promise<Response>{
     return await userEditController.handle(request,response)
  })
- usersRoutes.delete("/delete/:token/:userId", async function(request, response){
+ usersRoutes.delete("/delete/:token/:userId", async function(request: Request, response: Response): Promise<Response>{
     return await deleteUserController.handle(request,response)
  })
- usersRoutes.get("/summary/:token", async function(request, response){
+ usersRoutes.get("/summary/:token", async function(request: Request, response: Response): Promise<Response>{
     return await userSummaryController.handle(request, response)
  })
- usersRoutes.get("/data/:token", async function (request, response){
+ usersRoutes.get("/data/:token", async function (request: Request, response: Response): Promise<Response>{
    return await userDataController.handle(request,response)
  })
          //END USERS
          //START ORDERS
- ordersRoutes.post("/create/:token", async function (request, response){
+ ordersRoutes.post("/create/:token", async function(request: Request, response: Response): Promise<Response>{
    return await createOrderController.handle(request, response)
  })
- ordersRoutes.get("/list/:token", async function (request, response){
+ ordersRoutes.get("/list/:token", async function (request: Request, response: Response): Promise<Response>{
    return await listOrdersController.handle(request, response)
  })
- ordersRoutes.patch("/edit/:token", async function(request, response){
+ ordersRoutes.patch("/edit/:token", async function(request: Request, response: Response): Promise<Response>{
    return await editOrderController.handle(request, response)
  })
- ordersRoutes.delete("/delete/:token", async function (request, response){
+ ordersRoutes.delete("/delete/:token", async function (request: Request, response: Response): Promise<Response>{
    return await deleteOrderController.handle(request, response)
  })
          //END ORDERS
          //START EXPENSES
- expensesRoutes.get("/list/:token", async function (request, response) {
+ expensesRoutes.get("/list/:token", async function(request: Request, response: Response): Promise<Response> {
    return await listExpensesController.handle(request,response)
  })
- expensesRoutes.post("/create/:token", async function (request, response){
+ expensesRoutes.post("/create/:token", async function(request: Request, response: Response): Promise<Response>{
    return await createExpenseController.handle(request, response)
  })
- expensesRoutes.patch("/edit/:token", async function (request, response){
+ expensesRoutes.patch("/edit/:token", async function (request: Request, response: Response): Promise<Response>{
    return await editExpensesController.handle(request, response)
  })
- expensesRoutes.delete("/delete/:token", async function (request, response){
+ expensesRoutes.delete("/delete/:token", async function(request: Request, response: Response): Promise<Response>{
    return await deleteExpenseController.handle(request,response)
  })
          //END EXPENSES
