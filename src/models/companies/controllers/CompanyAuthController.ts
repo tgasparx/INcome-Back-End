@@ -12,7 +12,8 @@ export default class CompanyAuthController{
             response.status(200)
         return response.json(auth)
         }else{
-           throw new Error("Usuário ou senha incorretos");
+          response.status(406)
+          return response.json({erro: ""})
            
         }
 
