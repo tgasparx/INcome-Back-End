@@ -1,12 +1,14 @@
+import Database from "../../../database"
+import IExpenseData from "../models/IExpenseData"
 
 
 export default class ExpensesRepository{
-    database: any
-    constructor(database: any){
+    database: Database
+    constructor(database: Database){
         this.database = database
     }
 
-    async createExpense({status, value, description}: any, token: string){
+    async createExpense({description, value, status}: IExpenseData, token: string){
         const created = await this.database.createExpense({status, value, description}, token)
         return created
     }
@@ -15,7 +17,7 @@ export default class ExpensesRepository{
         return list
          
     }
-    async editExpense({description, value, status}: any, expenseId: string, token: string){
+    async editExpense({description, value, status}: IExpenseData, expenseId: string, token: string){
         const edited = await this.database.editExpense({description, value, status}, expenseId, token)
         return edited
     }

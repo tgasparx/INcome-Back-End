@@ -36,6 +36,7 @@ app.use("/expenses", expensesRoutes)
 
 //END CONFIG
 //START ROUTES
+         // START COMPANIES
 companiesRoutes.get("/list", async function(request, response) {
     return await listAllCompaniesController.handle(request, response)
 })
@@ -66,16 +67,13 @@ companiesRoutes.get("/employees/:token", async function (request, response){
 companiesRoutes.put("/changePassword/:token", async function(request, response){
    return await changePasswordController.handle(request, response)
 })
-
-
-
-
+         //END COMPANIES
+         // START USERS
  usersRoutes.get("/list", async function (request, response){
     return await listAllUsersController.handle(request,response)
  })
  usersRoutes.post("/create/:token", async function(request, response){
     return await createNewUserController.handle(request, response)
-   // return response.json({body: request.body, params: request.params})
  })
  usersRoutes.post("/auth", async function(request, response){
     return await userAuthController.handle(request,response)
@@ -95,9 +93,11 @@ companiesRoutes.put("/changePassword/:token", async function(request, response){
  usersRoutes.get("/data/:token", async function (request, response){
    return await userDataController.handle(request,response)
  })
-
-
-
+         //END USERS
+         //START ORDERS
+ ordersRoutes.post("/create/:token", async function (request, response){
+   return await createOrderController.handle(request, response)
+ })
  ordersRoutes.get("/list/:token", async function (request, response){
    return await listOrdersController.handle(request, response)
  })
@@ -107,11 +107,13 @@ companiesRoutes.put("/changePassword/:token", async function(request, response){
  ordersRoutes.delete("/delete/:token", async function (request, response){
    return await deleteOrderController.handle(request, response)
  })
-
-
- 
+         //END ORDERS
+         //START EXPENSES
  expensesRoutes.get("/list/:token", async function (request, response) {
    return await listExpensesController.handle(request,response)
+ })
+ expensesRoutes.post("/create/:token", async function (request, response){
+   return await createExpenseController.handle(request, response)
  })
  expensesRoutes.patch("/edit/:token", async function (request, response){
    return await editExpensesController.handle(request, response)
@@ -119,6 +121,7 @@ companiesRoutes.put("/changePassword/:token", async function(request, response){
  expensesRoutes.delete("/delete/:token", async function (request, response){
    return await deleteExpenseController.handle(request,response)
  })
+         //END EXPENSES
 //END ROUTES
 
 

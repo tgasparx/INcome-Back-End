@@ -8,6 +8,16 @@ import { Like } from "typeorm";
 import { compare, hash } from 'bcrypt'
 import { Order } from "./Models/order.entity";
 import { Expense } from "./Models/expense.entity";
+import Company from "../models/companies/models/Company";
+import ICompanyData from "../models/companies/models/ICompanyData";
+import ICompanyAuthReponse from "../models/companies/models/ICompanyAuthResponse";
+import IEditCompanyData from "../models/companies/models/IEditCompanyData";
+import IUserData from "../models/users/models/IUserData";
+import IUser from "../models/users/models/IUser";
+import IUserAuthResponse from "../models/users/models/IUserAuthResponse";
+import IUserSummary from "../models/users/models/IUserSummary";
+import IListExpense from "../models/expenses/models/IListExpense";
+import IListOrder from "../models/orders/models/IListOrder";
 
 
 export default class Database {
@@ -16,7 +26,7 @@ export default class Database {
 
 
   // START COMPANIES
-  async getCompanyIdByToken(token: string) {
+  async getCompanyIdByToken(token: string): Promise<string> {
     try {
       let companyId
       const referedCompanyIdByToken = await myDataSource.getRepository(CompanyAuth).findBy({ token: Like(`${token}`) })
@@ -25,21 +35,21 @@ export default class Database {
         companyId = referedCompanyIdByToken[0].company
         return companyId
       } else {
-        return false
+        return ""
       }
     } catch (error) {
       console.log(error)
-      return false
+      return ""
     }
   }
-  async listAllCompanies() {
+  async listAllCompanies(): Promise<Companies[]> {
     // const companies = await myDataSource.createQueryBuilder(Companies,"companies").leftJoinAndSelect("auth", "auth").execute()
 
     const companies = await myDataSource
       .getRepository(Companies).find()
     return companies
   }
-  async createCompany(companyData: any) {
+  async createCompany(companyData: ICompanyData): Promise<boolean> {
     const isCompanyEmailAlreadyExists = await myDataSource
       .getRepository(Companies).findBy({ cnpj: Like(`${companyData.company_cnpj}`) })
     const isCompanyCNPJAlreadyExists = await myDataSource
@@ -65,7 +75,7 @@ export default class Database {
       return false
     }
   }
-  async companyAuth({ email, password }) {
+  async companyAuth({ email, password }): Promise<ICompanyAuthReponse | false> {
     try {
       const referedCompany = await myDataSource
         .getRepository(Companies).findBy({ email: Like(`${email}`) })
@@ -117,31 +127,36 @@ export default class Database {
       return false
     }
   }
-  async editCompany({ name, email, cnpj }: any, token: any) {
+  async editCompany({ name, email, cnpj }: IEditCompanyData, token: any): Promise<boolean> {
     const companyId = await this.getCompanyIdByToken(token)
     const isCnpjAlreadyExists = await myDataSource.getRepository(Companies).findBy({ cnpj: Like(`${cnpj}`) })
     const isEmailAlreadyExists = await myDataSource.getRepository(Companies).findBy({ email: Like(`${email}`) })
     console.log("isalreadyexists", isCnpjAlreadyExists)
-    if (!isCnpjAlreadyExists[0] && !isEmailAlreadyExists[0]) {
-      const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email, cnpj: cnpj }).where("id = :id", { id: companyId })
-        .execute()
-    } else {
-      if (isEmailAlreadyExists[0] && !isCnpjAlreadyExists[0]) {
-        const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, cnpj: cnpj }).where("id = :id", { id: companyId })
+    if(companyId){
+      if (!isCnpjAlreadyExists[0] && !isEmailAlreadyExists[0]) {
+        const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email, cnpj: cnpj }).where("id = :id", { id: companyId })
           .execute()
+      } else {
+        if (isEmailAlreadyExists[0] && !isCnpjAlreadyExists[0]) {
+          const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, cnpj: cnpj }).where("id = :id", { id: companyId })
+            .execute()
+        }
+        if (isCnpjAlreadyExists[0] && !isEmailAlreadyExists[0]) {
+          const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email }).where("id = :id", { id: companyId })
+            .execute()
+        }
+        if (isCnpjAlreadyExists[0] && isEmailAlreadyExists[0]) {
+          const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name }).where("id = :id", { id: companyId })
+            .execute()
+        }
+  
       }
-      if (isCnpjAlreadyExists[0] && !isEmailAlreadyExists[0]) {
-        const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email }).where("id = :id", { id: companyId })
-          .execute()
-      }
-      if (isCnpjAlreadyExists[0] && isEmailAlreadyExists[0]) {
-        const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name }).where("id = :id", { id: companyId })
-          .execute()
-      }
-
+  
+      return true // está aqui////////////////////////
+    }else{
+      return false
     }
 
-    return { ok: "OK" } // está aqui////////////////////////
   }
   async deleteCompany(token: string, password: string) {
     const companyId = await this.getCompanyIdByToken(token)
@@ -230,11 +245,9 @@ export default class Database {
   }
   // END COMPANIES
   // START ORDERS
-  async createOrder({ status, value, description, client, km, driver }: any, token: string) {
+  async createOrder({ status, value, description, client, km, driver }: any, token: string): Promise<boolean> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
-    if (!companyIdByToken) {
-      return { error: { message: "Não foi possível encontrar" } }
-    } else {
+    if(companyIdByToken){
       const newOrder = {
         order_id: `${(Math.random() * (Math.random()) * 1000)}`,
         owner_company: companyIdByToken,
@@ -248,64 +261,86 @@ export default class Database {
       const create = await myDataSource.getRepository(Order).create(newOrder)
       const created = await myDataSource.getRepository(Order).save(create)
 
-      return created
+      return true
+    }else{
+      return false
     }
+   
+    
   }
-  async editOrder({ description, value, status, driver, km }: any, orderId: string, token: string) {
+  async editOrder({ description, value, status, driver, km }: any, orderId: string, token: string): Promise<boolean> {
     const userId = this.getUserIdByToken(token)
-    console.log(userId)
-    const edited = await myDataSource.getRepository(Order).createQueryBuilder().update(Order).set({ description, value, status, driver, km }).where("order_id = :id", { id: orderId })
-      .execute()
-    return edited
-  }
-  async listOrders(token: string) {
-    const companyId = await this.getCompanyIdByToken(token)
-    const companyOrders = await myDataSource.getRepository(Order).findBy({ owner_company: Like(`${companyId}`) })
-    const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
-    const templateSummary = {
-      orders_summary: {
-        page: 1,
-        perPage: 20,
-        total_records: companyOrders.length,
-        all_orders: companyOrders
-      }
+    if(userId){
+      console.log(userId)
+      const edited = await myDataSource.getRepository(Order).createQueryBuilder().update(Order).set({ description, value, status, driver, km }).where("order_id = :id", { id: orderId })
+        .execute()
+      return true
+    }else{
+      return false
     }
-    return templateSummary
   }
-  async deleteOrder(orderId: string, token: string){
+  async listOrders(token: string): Promise<IListOrder | boolean> {
+    const companyId = await this.getCompanyIdByToken(token)
+    if(companyId){
+      const companyOrders = await myDataSource.getRepository(Order).findBy({ owner_company: Like(`${companyId}`) })
+      const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
+      const templateSummary = {
+        orders_summary: {
+          page: 1,
+          perPage: 20,
+          total_records: companyOrders.length,
+          all_orders: companyOrders
+        }
+      }
+      return templateSummary
+    }else{
+      return false
+    }
+  }
+  async deleteOrder(orderId: string, token: string): Promise<boolean>{
     const companyId = await this.getCompanyIdByToken(token)
     if(companyId){
       const deleted = await myDataSource.getRepository(Order).createQueryBuilder().delete().from(Order).where("order_id = :id", { id: Like(`${orderId}`) })
         .execute()
-        return deleted
+        return true
+    }else{
+      return false
     }
     
   }
   // END ORDERS
   // START EXPENSES
-  async createExpense({ status, value, description }: any, token: string) {
+  async createExpense({ status, value, description }: any, token: string): Promise<boolean> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
-    const newExpense = {
-      expense_id: `${(Math.random() * (Math.random()) * 1000)}`,
-      owner_company: companyIdByToken,
-      description: description,
-      status: status,
-      value: parseInt(value),
+    if(companyIdByToken){
+      const newExpense = {
+        expense_id: `${(Math.random() * (Math.random()) * 1000)}`,
+        owner_company: companyIdByToken,
+        description: description,
+        status: status,
+        value: parseInt(value),
+      }
+      const create = await myDataSource.getRepository(Expense).create(newExpense)
+      const created = await myDataSource.getRepository(Expense).save(create)
+      return true
+    }else{
+      return false
     }
-    const create = await myDataSource.getRepository(Expense).create(newExpense)
-    const created = await myDataSource.getRepository(Expense).save(create)
-    return created
 
   }
-  async editExpense({description, value, status}: any, expenseId: string, token: string){
+  async editExpense({description, value, status}: any, expenseId: string, token: string): Promise<boolean>{
     console.log(description, value, status, expenseId, token)
     const userId = this.getUserIdByToken(token)
     console.log(userId)
-    const edited = await myDataSource.getRepository(Expense).createQueryBuilder().update(Expense).set({ description, value, status }).where("expense_id = :id", { id: expenseId })
+    if(userId){
+      const edited = await myDataSource.getRepository(Expense).createQueryBuilder().update(Expense).set({ description, value, status }).where("expense_id = :id", { id: expenseId })
       .execute()
-    return edited
+    return true
+    }else{
+      return false
+    }
   }
-  async listExpenses(token: string) {
+  async listExpenses(token: string): Promise<IListExpense> {
     const companyId = await this.getCompanyIdByToken(token)
     const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
     console.log("referedbyId", referedCompanyById[0])
@@ -321,17 +356,19 @@ export default class Database {
     }
     return templateSummary
   }
-  async deleteExpense(expenseId: string, token: string){
+  async deleteExpense(expenseId: string, token: string): Promise<boolean>{
     const companyId = await this.getCompanyIdByToken(token)
     if(companyId){
       const deleted = await myDataSource.getRepository(Expense).createQueryBuilder().delete().from(Order).where("expense_id = :id", { id: Like(`${expenseId}`) })
         .execute()
-        return deleted
+        return true
+    }else{
+      return false
     }
   }
   // END EXPENSES
   // START USERS
-  async getUserIdByToken(token: string) {
+  async getUserIdByToken(token: string): Promise<string> {
     try {
       let companyId
       const referedUserIdByToken = await myDataSource.getRepository(UserAuth).findBy({ token: Like(`${token}`) })
@@ -340,19 +377,19 @@ export default class Database {
         companyId = referedUserIdByToken[0].user
         return companyId
       } else {
-        return false
+        return ""
       }
     } catch (error) {
       console.log(error)
-      return false
+      return ""
     }
   }
-  async listAllUsers() {
+  async listAllUsers(): Promise<IUser[]> {
     const users = await myDataSource.getRepository(Users).find()
     return users
 
   }
-  async createUser({ name, email, password, cpf }: any, token: string) {
+  async createUser({ name, email, password, cpf }: IUserData, token: string): Promise<IUser | {}> {
     const companyId = await this.getCompanyIdByToken(token)
     const hashedPassword = await hash(password, 10)
     const isOkUserData = {
@@ -363,28 +400,32 @@ export default class Database {
       company: companyId,
       cpf
     }
+
     try {
-      const create = await myDataSource.getRepository(Users).create(isOkUserData)
-      const created = await myDataSource.getRepository(Users).save(create)
-      return created
+
+        const create = await myDataSource.getRepository(Users).create(isOkUserData)
+        const created = await myDataSource.getRepository(Users).save(create)
+        return created
+      
+     
     } catch (error) {
       console.log(error)
       return { error: "Funcionário já cadastrado" }
     }
   }
-  async editUser({ name, email, password, cpf }: any, token: string, userId: string) {
+  async editUser({ name, email, password, cpf }: any, token: string, userId: string): Promise<{}> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
     const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, email, password, cpf }).where("id = :id", { id: userId })
       .execute()
     return { edited: "ok" }
   }
-  async deleteUser(token: string, userId) {
+  async deleteUser(token: string, userId): Promise<{}> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
     const deleted = await myDataSource.getRepository(Users).createQueryBuilder().delete().from(Users).where("id = :id", { id: `${userId}` })
       .execute()
     return { deleted: "OK" }
   }
-  async userAuth({ email, password }) {
+  async userAuth({ email, password }): Promise<IUserAuthResponse | boolean> {
     try {
       const referedUser = await myDataSource
         .getRepository(Users).findBy({ email: Like(`${email}`) })
@@ -437,7 +478,7 @@ export default class Database {
     }
     // return {ok: "OK"}
   }
-  async userSummary(token: string) {
+  async userSummary(token: string): Promise<IUserSummary> {
     const userId = await this.getUserIdByToken(token)
     const userOrders = await myDataSource.getRepository(Order).findBy({ driver: Like(`${userId}`) })
     console.log(userOrders)
@@ -453,7 +494,7 @@ export default class Database {
       total_pedidos: userOrders.length,
       total_pedidos_finalizados: userOrders.filter((e) => e.status === "Concluída").length
     }
-    return { templateSummary }
+    return templateSummary 
   }
   // END USERS
 }

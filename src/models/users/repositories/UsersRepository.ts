@@ -2,8 +2,8 @@ import IUsersRepository from "./IUsersRepository";
 import Database from "../../../database";
 
 export default class UsersRepository implements IUsersRepository {
-    database: any
-    constructor(database: any) {
+    database: Database
+    constructor(database: Database) {
         this.database = database
     }
 

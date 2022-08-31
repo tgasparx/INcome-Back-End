@@ -1,18 +1,20 @@
+import Database from "../../../database"
+import IOrderData from "../models/IOrderData"
 
 
 export default class OrdersRepository{
-    database: any
-    constructor(database: any){
+    database: Database
+    constructor(database: Database){
         this.database = database
     }
 
 
-async createOrder({status, value, description, client, km, driver}: any, token: string){
+async createOrder({description, value, status, client, km, driver}: IOrderData, token: string){
  const created = await this.database.createOrder({status, value, description, client, km, driver}, token)
  return created
 }
-async editOrder({description, value, status, driver, km}: any, orderId: string, token: string){
-    const edited = await this.database.editOrder({description, value, status, driver, km}, orderId, token)
+async editOrder({description, value, status, client, km, driver}: any, orderId: string, token: string){
+    const edited = await this.database.editOrder({description, value, status, client, km, driver}, orderId, token)
     return edited
 }
 async listOrders(token:string){
