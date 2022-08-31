@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, PrimaryColumn, JoinColumn, OneToOne, Generated } from "typeorm"
-import { Companies } from "./company.entity"
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn} from "typeorm"
 
 @Entity()
 export class Expense {

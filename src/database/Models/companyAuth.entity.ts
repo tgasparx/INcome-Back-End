@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, PrimaryColumn, JoinColumn, OneToOne, Generated } from "typeorm"
-import { Companies } from "./company.entity"
+import { Entity, Column, PrimaryGeneratedColumn,  UpdateDateColumn } from "typeorm"
 
 @Entity()
 export class CompanyAuth {
@@ -9,10 +8,6 @@ export class CompanyAuth {
     @Column()
     company_name: string
 
-    // @PrimaryColumn()
-    // @OneToOne((type) => Companies, auth => CompanyAuth)
-    // company: Company
-    // @JoinColumn()
     @Column()
     company: string
 
@@ -26,26 +21,3 @@ export class CompanyAuth {
     type: string
 
 }
-
-// export class CompanyAuth {
-//     @PrimaryGeneratedColumn()
-//     auth_id: string
-
-//     @Column()
-//     company_name: string
-
-//     // @OneToOne((type) => Companies)
-//     // @JoinColumn()
-//     @Column()
-//     company: string //Companies
-
-//     @UpdateDateColumn()
-//     last_login: Date
-
-//     @Column()
-//     token: string
-
-//     @Column()
-//     type: string
-
-// }

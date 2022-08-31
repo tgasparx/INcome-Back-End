@@ -1,8 +1,9 @@
 import { Request, Response } from "express"
+import IListAllCompaniesController from "./IListAllCompaniesController"
 
 
 
-export default class ListAllCompaniesController {
+export default class ListAllCompaniesController implements IListAllCompaniesController{
     listAllCompaniesUseCase: any
     constructor(listAllCompaniesUseCase: any) {
         this.listAllCompaniesUseCase = listAllCompaniesUseCase
@@ -10,7 +11,12 @@ export default class ListAllCompaniesController {
 
     async handle(request: Request, response: Response) {
         const created = await this.listAllCompaniesUseCase.execute()
-        // const finalResultsListAllCompanies = {page: 1, perPage: 10,total_pages: 1, total_records: created.length, records: created}
-        return response.json(created)
+        if(created){
+            return response.json(created)
+        }else{
+            response.status(400)
+            response.send("Ocorreu um erro interno")
+        }
+        
     }
 }

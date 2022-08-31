@@ -1,6 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from "typeorm"
-import { Companies } from "./company.entity"
-import { Users } from "./user.entity"
+import { Entity, Column, PrimaryGeneratedColumn,  UpdateDateColumn } from "typeorm"
 
 @Entity()
 export class UserAuth {
@@ -10,12 +8,8 @@ export class UserAuth {
     @Column()
     user_name: string
 
-    // @OneToOne((type) => Users, auth => UserAuth)
-    // @JoinColumn()
-    // user: Users
 
     @Column()
-    // @JoinColumn()
     user: string
 
     @UpdateDateColumn()
