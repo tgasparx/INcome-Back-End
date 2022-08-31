@@ -10,7 +10,8 @@ import { Companies } from './database/Models/company.entity'
 import { createNewUserController, deleteUserController, listAllUsersController, userAuthController, userDataController, userEditController, userSummaryController } from './models/users/controllers'
 import { createExpenseController, listExpensesController } from './models/expenses/controllers'
 import CreateExpenseController from './models/expenses/controllers/CreateExpenseController'
-import { createOrderController } from './models/orders/controllers'
+import { createOrderController, editOrderController, listOrdersController } from './models/orders/controllers'
+import { ordersRoutes } from './routes/orders.routes'
 //END IMPORT
 //START CONFIG
 
@@ -27,6 +28,7 @@ const port = 4000
 app.use(express.json())
 app.use("/companies",companiesRoutes)
 app.use("/users", usersRoutes)
+app.use("/orders", ordersRoutes)
 
 
 
@@ -68,11 +70,12 @@ companiesRoutes.post("/expenses/create/:token", async function (request, respons
 companiesRoutes.post("/orders/create/:token", async function(request, response){
    return await createOrderController.handle(request, response)
 })
-
+companiesRoutes.patch("/orders/edit/:token", async function( request, response){
+   return await editOrderController.handle(request, response)
+})
 companiesRoutes.put("/changePassword/:token", async function(request, response){
    return await changePasswordController.handle(request, response)
 })
-
 
 
 
@@ -102,7 +105,15 @@ companiesRoutes.put("/changePassword/:token", async function(request, response){
  usersRoutes.get("/data/:token", async function (request, response){
    return await userDataController.handle(request,response)
  })
+
+
+
+ ordersRoutes.get("/list/:token", async function (request, response){
+   return await listOrdersController.handle(request, response)
+ })
 //END ROUTES
+
+
 
 //START CONFIG
 app.listen(port, () => console.log(`app running on port ${4000}`))

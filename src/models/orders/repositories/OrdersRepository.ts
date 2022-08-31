@@ -11,4 +11,8 @@ async createOrder({status, value, description, client, km, driver}: any, token: 
  const created = await this.database.createOrder({status, value, description, client, km, driver}, token)
  return created
 }
+async editOrder({description, value, status, driver, km}: any, orderId: string, token: string){
+    const edited = await this.database.editOrder({description, value, status, driver, km}, orderId, token)
+    return edited
+}
 }

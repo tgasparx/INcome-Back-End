@@ -238,6 +238,13 @@ export default class Database {
       return created
     }
   }
+  async editOrder({description, value, status, driver, km}: any, orderId: string, token: string){
+    const userId = this.getUserIdByToken(token)
+    console.log(userId)
+    const edited = await myDataSource.getRepository(Order).createQueryBuilder().update(Order).set({description, value, status, driver, km }).where("order_id = :id", { id: orderId })
+    .execute()
+  return edited
+    }
   async createExpense({ status, value, description }: any, token: string) {
     const companyIdByToken = await this.getCompanyIdByToken(token)
     const newExpense = {
