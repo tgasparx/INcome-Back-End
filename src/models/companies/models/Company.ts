@@ -10,7 +10,7 @@ export default class Company implements ICompany{
     email: string
     password: string
     cnpj: string
-    created_at: string
+    created_at: Date
     updated_at: Date
     auth: CompanyAuth
     users: Users[]

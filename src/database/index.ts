@@ -18,6 +18,9 @@ import IUserAuthResponse from "../models/users/models/IUserAuthResponse";
 import IUserSummary from "../models/users/models/IUserSummary";
 import IListExpense from "../models/expenses/models/IListExpense";
 import IListOrder from "../models/orders/models/IListOrder";
+import ICompany from "../models/companies/models/ICompany";
+import IListEmployees from "../models/companies/models/IListEmployees";
+import ICompanySummary from "../models/companies/models/ICompanySummary";
 
 
 export default class Database {
@@ -158,7 +161,7 @@ export default class Database {
     }
 
   }
-  async deleteCompany(token: string, password: string) {
+  async deleteCompany(token: string, password: string): Promise<boolean> {
     const companyId = await this.getCompanyIdByToken(token)
     const referedCompany = await myDataSource
       .getRepository(Companies).findBy({ id: Like(`${companyId}`) })
@@ -169,48 +172,42 @@ export default class Database {
       const deleted = await myDataSource.getRepository(Companies).createQueryBuilder().delete().from(Companies).where("id = :id", { id: `${companyId}` })
         .execute()
       console.log("deleted", deleted)
-      return companyId
+      return true
     } else {
-      return { error: "erro" }
+      return false
     }
   }
-  async companySummary(token: string) {
+  async companySummary(token: string): Promise<ICompanySummary | boolean> {
     const companyId = await this.getCompanyIdByToken(token)
-    if (!companyId) {
-      return { error: { message: "Não foi possível encontrar" } }
-    } else {
-      console.log("userid", companyId, typeof companyId)
-      const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
-      console.log("referedbyId", referedCompanyById[0])
-      const companyOrders = await myDataSource.getRepository(Order).findBy({ owner_company: Like(`${companyId}`) })
-      console.log("companyOrders", companyOrders)
-      const companyExpenses = await myDataSource.getRepository(Expense).findBy({ owner_company: Like(`${companyId}`) })
-      console.log("companyOrders", companyExpenses)
-
-
-      const templateSummary = {
-        company_name: referedCompanyById[0].name,
-        orders_summary: {
-          page: 1,
-          perPage: 20,
-          total_records: companyOrders.length,
-          all_orders: companyOrders
-        },
-        expenses_summary: {
-          page: 1,
-          perPage: 20,
-          total_records: companyExpenses.length,
-          all_expenses: companyExpenses
+      if(companyId){
+        const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
+        const companyOrders = await myDataSource.getRepository(Order).findBy({ owner_company: Like(`${companyId}`) })
+        const companyExpenses = await myDataSource.getRepository(Expense).findBy({ owner_company: Like(`${companyId}`) })
+        const templateSummary = {
+          company_name: referedCompanyById[0].name,
+          orders_summary: {
+            page: 1,
+            perPage: 20,
+            total_records: companyOrders.length,
+            all_orders: companyOrders
+          },
+          expenses_summary: {
+            page: 1,
+            perPage: 20,
+            total_records: companyExpenses.length,
+            all_expenses: companyExpenses
+          }
         }
+        return templateSummary
+      }else{
+        return false
       }
-      return templateSummary
-    }
+   
+    
   }
-  async listCompanyEmployees(token: string) {
+  async listCompanyEmployees(token: string): Promise<IListEmployees | boolean> {
     const companyId = await this.getCompanyIdByToken(token)
-    if (!companyId) {
-      return { error: { message: "Não foi possível encontrar" } }
-    } else {
+    if(companyId){
       console.log(token)
       const employees = await myDataSource.getRepository(Users).findBy({ company: Like(`${companyId}`) })
       const companyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
@@ -224,9 +221,13 @@ export default class Database {
         }
       }
       return templateCompanyEmployees
+    }else{
+      return false
     }
+  
+    
   }
-  async companyData(token: string) {
+  async companyData(token: string): Promise<ICompany> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
     const data = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyIdByToken}`) })
     return data[0]
