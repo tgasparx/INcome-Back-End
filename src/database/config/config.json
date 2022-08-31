@@ -4,7 +4,7 @@
         "port": "5432",
         "host": "localhost",
         "schema": "public",
-        "database": "",
+        "database": "income",
         "username": "admin",
         "password": "autoluby",
         "logging": true
