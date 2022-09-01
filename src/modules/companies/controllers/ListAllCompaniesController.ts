@@ -12,6 +12,7 @@ export default class ListAllCompaniesController implements IListAllCompaniesCont
     async handle(request: Request, response: Response) {
         const created = await this.listAllCompaniesUseCase.execute()
         if(created){
+            response.status(200)
             return response.json(created)
         }else{
             response.status(400)

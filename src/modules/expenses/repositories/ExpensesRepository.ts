@@ -14,7 +14,7 @@ export default class ExpensesRepository implements IExpensesRepository{
         const created = await this.database.createExpense({status, value, description}, token)
         return created
     }
-    async listExpenses(token: string): Promise<IListExpense>{
+    async listExpenses(token: string): Promise<IListExpense | false>{
         const list = await this.database.listExpenses(token)
         return list
          

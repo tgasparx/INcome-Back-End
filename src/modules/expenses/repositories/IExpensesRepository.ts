@@ -6,7 +6,7 @@ import IListExpense from "../models/IListExpense";
 export default interface IExpensesRepository{
     database: Database
     createExpense: ({}:IExpenseData, token: string) => Promise<boolean>
-    listExpenses: (token: string) => Promise<IListExpense>
+    listExpenses: (token: string) => Promise<IListExpense | false>
     deleteExpense: (expenseId: string, token: string) => Promise<boolean>
     editExpense: ({description, value, status}: IExpenseData, expenseId: string, token: string) => Promise<boolean>
 }

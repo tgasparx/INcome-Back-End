@@ -8,7 +8,7 @@ export default class ListCompanyEmployeesUseCase implements IListCompanyEmployee
     constructor(companiesRepository: ICompaniesRepository){
 this.companiesRepository = companiesRepository
     }
-    async execute(token: string): Promise<IListEmployees | boolean>{
+    async execute(token: string): Promise<IListEmployees | false>{
         const employees = await this.companiesRepository.listCompanyEmployees(token)
         return employees
     }

@@ -5,6 +5,6 @@ import { ICompaniesRepository } from "../repositories/ICompaniesRepository";
 
 export default interface IListCompanyEmployeesUseCase{
     companiesRepository: ICompaniesRepository
-    execute: (token: string) => Promise<IListEmployees | boolean>
+    execute: (token: string) => Promise<IListEmployees | false>
 
 }

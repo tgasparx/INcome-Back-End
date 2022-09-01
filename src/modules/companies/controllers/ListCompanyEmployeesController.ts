@@ -10,6 +10,13 @@ export default class ListCompanyEmployeesController{
     async handle(request: Request, response: Response): Promise<Response>{
         const {token} = request.params
         const employees = await this.listCompanyEmployeesUseCase.execute(token)
-    return response.json(employees)
+        if(employees){
+            response.status(200)
+            return response.json(employees)
+        }else{
+            response.status(400)
+            return response.send("Ocorreu um erro interno")
+        }
+
     }
 }

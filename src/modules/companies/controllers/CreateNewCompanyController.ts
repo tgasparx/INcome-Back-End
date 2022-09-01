@@ -27,7 +27,7 @@ export default class CreateNewCompanyController implements ICreateNewCompanyCont
         }
         const created = await this.createNewCompanyUseCase.execute(companyData)
         if(created){
-            return response.status(201).json(companyData)///////////////////////////////////////
+            return response.status(201).json(companyData)
         }else{
             return response.status(406).send("Erro, email ou CNPJ já cadastrados")
         }

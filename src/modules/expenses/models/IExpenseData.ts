@@ -1,6 +1,6 @@
 
 export default interface IExpenseData{
     description: string
-    value: string
+    value: number
     status: string
 }
