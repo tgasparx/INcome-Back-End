@@ -1,8 +1,9 @@
 import Database from "../../../database"
 import IOrderData from "../models/IOrderData"
+import IOrdersRepository from "./IOrdersRepository"
 
 
-export default class OrdersRepository{
+export default class OrdersRepository implements IOrdersRepository{
     database: Database
     constructor(database: Database){
         this.database = database

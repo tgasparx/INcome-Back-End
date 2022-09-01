@@ -20,9 +20,10 @@ import IListOrder from "../models/orders/models/IListOrder";
 import ICompany from "../models/companies/models/ICompany";
 import IListEmployees from "../models/companies/models/IListEmployees";
 import ICompanySummary from "../models/companies/models/ICompanySummary";
+import IDatabase from "./IDatabase";
 
 
-export default class Database {
+export default class Database implements IDatabase {
   constructor() {
   }
 

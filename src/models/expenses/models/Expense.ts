@@ -6,7 +6,7 @@ export default class Expense implements IExpense{
     owner_company: string
     description: string
     status: string
-    value: string
+    value: number
     created_at: Date
     updated_at: Date
 }

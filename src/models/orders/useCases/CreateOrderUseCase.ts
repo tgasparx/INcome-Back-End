@@ -1,8 +1,9 @@
+import IOrdersRepository from "../repositories/IOrdersRepository"
 
 
 export default class CreateOrderUseCase{
-    ordersRepository: any
-    constructor(ordersRepository){
+    ordersRepository: IOrdersRepository
+    constructor(ordersRepository: IOrdersRepository){
         this.ordersRepository = ordersRepository
     }
     async execute({status, value, description, client, km, driver}: any, token: string){
