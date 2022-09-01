@@ -7,7 +7,7 @@ export default class ListExpensesUseCase implements IListExpensesUsecase{
     constructor(expensesRepository: IExpensesRepository){
         this.expensesRepository = expensesRepository
     }
-    async execute(token: string): Promise<IListExpense>{
+    async execute(token: string): Promise<IListExpense | false>{
         const list = await this.expensesRepository.listExpenses(token)
         return list
     }

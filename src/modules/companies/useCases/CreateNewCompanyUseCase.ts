@@ -10,7 +10,7 @@ export default class CreateNewCompanyUseCase  implements ICreateNewCompanyUseCas
         this.companiesRepository = companiesRepository
     }
 
-    async execute(companyData: ICompanyData) {
+    async execute(companyData: ICompanyData): Promise<boolean> {
     const created = await this.companiesRepository.createCompany(companyData)
     return created
     }

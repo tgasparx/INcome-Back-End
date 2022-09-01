@@ -8,7 +8,7 @@ export default class CreateExpenseUseCase{
         this.expensesRepository = expensesRepository
     }
 
-async execute({status, value, description}: IExpenseData, token: string){
+async execute({status, value, description}: IExpenseData, token: string): Promise<boolean>{
     const created = this.expensesRepository.createExpense({status, value, description}, token)
     return created
 }

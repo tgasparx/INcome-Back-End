@@ -34,7 +34,6 @@ export default class Database implements IDatabase {
   constructor() {
   }
 
-
   // START COMPANIES
   async getCompanyIdByToken(token: string): Promise<string | ""> {
     try {
@@ -309,9 +308,9 @@ export default class Database implements IDatabase {
         const newExpense = {
           expense_id: `${(Math.random() * (Math.random()) * 1000)}`,
           owner_company: companyIdByToken,
-          description: description,
-          status: status,
-          value: parseInt(value),
+          description,
+          status,
+          value
         }
         const create = await myDataSource.getRepository(Expense).create(newExpense)
         const created = await myDataSource.getRepository(Expense).save(create)
@@ -385,11 +384,11 @@ export default class Database implements IDatabase {
         const newOrder = {
           order_id: `${(Math.random() * (Math.random()) * 1000)}`,
           owner_company: companyIdByToken,
-          description: description,
+          description,
           client,
           km,
           driver,
-          status: status,
+          status,
           value,
         }
         const create = await myDataSource.getRepository(Order).create(newOrder)
@@ -410,10 +409,7 @@ export default class Database implements IDatabase {
     if (userId) {
    try {
     console.log(userId)
-    const kmnumber = parseInt(km)
-    const valuenumber = parseInt(value)
-
-    const edited = await myDataSource.getRepository(Order).createQueryBuilder().update(Order).set({ description, value: valuenumber, status, driver, km: kmnumber }).where("order_id = :id", { id: orderId })
+    const edited = await myDataSource.getRepository(Order).createQueryBuilder().update(Order).set({ description, value, status, driver, km }).where("order_id = :id", { id: orderId })
       .execute()
     return true
    } catch (error) {

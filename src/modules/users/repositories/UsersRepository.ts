@@ -1,14 +1,14 @@
 import IUsersRepository from "./IUsersRepository";
-import Database from "../../../database";
 import IUser from "../models/IUser";
 import IUserData from "../models/IUserData";
 import IUserAuthResponse from "../models/IUserAuthResponse";
 import IUserSummary from "../models/IUserSummary";
 import IEditUserData from "../models/IEditUserData";
+import IDatabase from "../../../database/IDatabase";
 
 export default class UsersRepository implements IUsersRepository {
-    database: Database
-    constructor(database: Database) {
+    database: IDatabase
+    constructor(database: IDatabase) {
         this.database = database
     }
 

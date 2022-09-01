@@ -8,7 +8,7 @@ export default class CompanySummaryController implements ICompanySummaryControll
     constructor(companySummaryUseCase: ICompanySummaryUseCase) {
         this.companySummaryUseCase = companySummaryUseCase
     }
-    async handle(request: Request, response: Response) {
+    async handle(request: Request, response: Response): Promise<Response> {
         const { token } = request.params
         const summary = await this.companySummaryUseCase.execute(token)
         if(summary){

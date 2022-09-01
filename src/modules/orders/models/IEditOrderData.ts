@@ -2,9 +2,9 @@
 
 export default interface IEditOrderData{
     description: string
-    value: string
+    value: number
     status: string
     client: string
     driver: string
-    km: string
+    km: number
 }

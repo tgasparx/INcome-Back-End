@@ -4,5 +4,5 @@ import { ICompaniesRepository } from "../repositories/ICompaniesRepository";
 
 export default interface ICompanySummaryUseCase{
     companiesRepository: ICompaniesRepository
-    execute: (token: string) => Promise<ICompanySummary | boolean> 
+    execute: (token: string) => Promise<ICompanySummary | false> 
 }

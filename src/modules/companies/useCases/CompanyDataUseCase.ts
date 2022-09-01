@@ -7,7 +7,7 @@ export default class CompanyDataUseCase implements ICompanyDataUseCase{
 constructor(companiesRepository: ICompaniesRepository){
     this.companiesRepository = companiesRepository
 }
-async execute(token: string): Promise<ICompany>{
+async execute(token: string): Promise<ICompany | false>{
   const data = await this.companiesRepository.companyData(token)
     return data
 }

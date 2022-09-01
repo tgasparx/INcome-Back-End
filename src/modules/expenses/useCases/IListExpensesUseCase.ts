@@ -5,5 +5,5 @@ import IExpensesRepository from "../repositories/IExpensesRepository";
 
 export default interface IListExpensesUsecase{
     expensesRepository: IExpensesRepository
-    execute: (token: string) => Promise<IListExpense>
+    execute: (token: string) => Promise<IListExpense | false>
 }

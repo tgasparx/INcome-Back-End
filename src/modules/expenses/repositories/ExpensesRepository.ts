@@ -1,12 +1,12 @@
-import Database from "../../../database"
+import IDatabase from "../../../database/IDatabase"
 import IExpenseData from "../models/IExpenseData"
 import IListExpense from "../models/IListExpense"
 import IExpensesRepository from "./IExpensesRepository"
 
 
 export default class ExpensesRepository implements IExpensesRepository{
-    database: Database
-    constructor(database: Database){
+    database: IDatabase
+    constructor(database: IDatabase){
         this.database = database
     }
 
@@ -19,11 +19,11 @@ export default class ExpensesRepository implements IExpensesRepository{
         return list
          
     }
-    async editExpense({description, value, status}: IExpenseData, expenseId: string, token: string){
+    async editExpense({description, value, status}: IExpenseData, expenseId: string, token: string): Promise<boolean>{
         const edited = await this.database.editExpense({description, value, status}, expenseId, token)
         return edited
     }
-    async deleteExpense(expenseId: string, token: string){
+    async deleteExpense(expenseId: string, token: string): Promise<boolean>{
         const deleted = await this.database.deleteExpense(expenseId, token)
         return deleted
     }

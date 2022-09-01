@@ -7,7 +7,7 @@ export default class CompanySummaryUseCase implements ICompanySummaryUseCase{
     constructor(companiesRepository: ICompaniesRepository){
         this.companiesRepository = companiesRepository
     }
-    async execute(token: string): Promise<ICompanySummary | boolean> {
+    async execute(token: string): Promise<ICompanySummary | false> {
         const summary = await this.companiesRepository.companySummary(token)
         return summary
 

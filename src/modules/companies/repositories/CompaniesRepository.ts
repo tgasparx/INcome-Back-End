@@ -1,4 +1,4 @@
-import Database from "../../../database"
+import IDatabase from "../../../database/IDatabase"
 import { Companies } from "../../../database/Models/company.entity"
 import IChangePasswordData from "../models/IChangePasswordData"
 import ICompany from "../models/ICompany"
@@ -11,8 +11,8 @@ import IListEmployees from "../models/IListEmployees"
 import { ICompaniesRepository } from "./ICompaniesRepository"
 
 export default class CompaniesRepository implements ICompaniesRepository {
-    database: Database
-    constructor(database: Database) {
+    database: IDatabase
+    constructor(database: IDatabase) {
         this.database = database
     }
 

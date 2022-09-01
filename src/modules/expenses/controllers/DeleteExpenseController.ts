@@ -7,7 +7,7 @@ export default class DeleteExpenseController implements IDeleteExpenseController
     constructor(deleteExpenseUseCase: IDeleteExpenseUseCase){
         this.deleteExpenseUseCase = deleteExpenseUseCase
     }
-    async handle(request: Request, response: Response){
+    async handle(request: Request, response: Response): Promise<Response>{
         const {expenseId} = request.body
         const {token} = request.params
         const deleted = await this.deleteExpenseUseCase.execute(expenseId, token)
