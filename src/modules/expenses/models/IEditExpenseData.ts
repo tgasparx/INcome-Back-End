@@ -2,6 +2,6 @@
 
 export default interface IEditExpenseData{
     description: string
-    value: string
+    value: number
     status: string
 }

@@ -14,10 +14,10 @@ export default class ChangePasswordController implements IChangePasswordControll
         const changed = await this.changePasswordUseCase.execute({password, newPassword}, token)
         if(changed){
             response.status(202)
-            return response.json({message: "Senha alterada", status: "202"})
+            return response.send("Senha alterada com sucesso")
         }else{
             response.status(406)
-           return response.send("Senha incorreta")
+           return response.send("Senha incorreta, ou a companhia não foi encontrada")
         }
         
     }

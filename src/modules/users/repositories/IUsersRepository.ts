@@ -6,11 +6,11 @@ import IUserSummary from "../models/IUserSummary"
 
 
 export default interface IUsersRepository{
-    listAllUsers: () => Promise<IUser[]> 
+    listAllUsers: () => Promise<IUser[] | false> 
     createUser: ({ name, email, password, cpf }: IUserData, token: string) => Promise<boolean>
     editUser: ({ name, email, password, cpf }: IEditUserData, token: string, userId: string) => Promise<boolean> 
-    userAuth: ({ email, password }) => Promise<IUserAuthResponse | boolean>
-    userSummary: (token: string) => Promise<IUserSummary>
-    userData: (token: string) => Promise<IUser | boolean>
+    userAuth: ({ email, password }) => Promise<IUserAuthResponse | false>
+    userSummary: (token: string) => Promise<IUserSummary | false>
+    userData: (token: string) => Promise<IUser | false>
     deleteUser: (token: string, userId: string) => Promise<boolean>
 }

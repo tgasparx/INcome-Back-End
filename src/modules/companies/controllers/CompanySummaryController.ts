@@ -11,6 +11,12 @@ export default class CompanySummaryController implements ICompanySummaryControll
     async handle(request: Request, response: Response) {
         const { token } = request.params
         const summary = await this.companySummaryUseCase.execute(token)
-        return response.json(summary)
+        if(summary){
+            response.status(200)
+            return response.json(summary)
+        }else{
+            response.status(406)
+            return response.send("Companhia não encontrada")
+        }
     }
 }

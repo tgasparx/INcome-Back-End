@@ -11,7 +11,14 @@ export default class CreateOrderController implements ICreateOrderController {
     async handle(request: Request, response: Response): Promise<Response> {
         const { status, value, description, client, km, driver } = request.body
         const { token } = request.params
-        const created = await this.createOrderUseCase.execute({ status, value, description, client, km, driver }, token)
-        return response.json(created)
+        const created: boolean = await this.createOrderUseCase.execute({ status, value, description, client, km, driver }, token)
+        if(created){
+            response.status(201)
+            return response.send("Pedido criado com sucesso")
+        }else{
+            response.status(406)
+            return response.send("Ocorreu um erro")
+        }
+      
     }
 }

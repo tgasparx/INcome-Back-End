@@ -13,7 +13,7 @@ export default class UsersRepository implements IUsersRepository {
     }
 
 
-    async listAllUsers(): Promise<IUser[]> {
+    async listAllUsers(): Promise<IUser[] | false> {
         const allCompanies = await this.database.listAllUsers()
         return allCompanies
     }
@@ -25,17 +25,17 @@ export default class UsersRepository implements IUsersRepository {
         const edited = await this.database.editUser({ name, email, password, cpf }, token, userId)
         return edited
     }
-    async userAuth({ email, password }): Promise<IUserAuthResponse | boolean> {
+    async userAuth({ email, password }): Promise<IUserAuthResponse | false> {
         const auth = await this.database.userAuth({ email, password })
         return auth
     }
 
-    async userSummary(token: string): Promise<IUserSummary>  {
+    async userSummary(token: string): Promise<IUserSummary | false>  {
         const summary = await this.database.userSummary(token)
         return summary
     }
-    async userData(token: string): Promise<IUser | boolean>{
-        const userData = this.database.userData(token)
+    async userData(token: string): Promise<IUser | false>{
+        const userData = await this.database.userData(token)
         return userData
     }
     async deleteUser(token: string, userId: string): Promise<boolean>{

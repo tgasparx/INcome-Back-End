@@ -7,7 +7,7 @@ export default class ListAllUsersUseCase implements IListAllUsersUseCase{
     constructor(usersRepository: IUsersRepository){
         this.usersRepository = usersRepository
     }
-    async execute(): Promise<IUser[]>{
+    async execute(): Promise<IUser[] | false>{
         const users = await this.usersRepository.listAllUsers()
         return users
     }

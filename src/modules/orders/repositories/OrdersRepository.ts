@@ -1,4 +1,5 @@
 import Database from "../../../database"
+import IEditOrderData from "../models/IEditOrderData"
 import IOrderData from "../models/IOrderData"
 import IOrdersRepository from "./IOrdersRepository"
 
@@ -14,7 +15,7 @@ async createOrder({description, value, status, client, km, driver}: IOrderData, 
  const created = await this.database.createOrder({status, value, description, client, km, driver}, token)
  return created
 }
-async editOrder({description, value, status, client, km, driver}: any, orderId: string, token: string){
+async editOrder({description, value, status, client, km, driver}: IEditOrderData, orderId: string, token: string){
     const edited = await this.database.editOrder({description, value, status, client, km, driver}, orderId, token)
     return edited
 }

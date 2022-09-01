@@ -9,7 +9,14 @@ export default class DeleteUserController implements IDeleteUserController{
     }
     async handle(request: Request, response: Response): Promise<Response>{
         const {token, userId} = request.params
-        const deleted = await this.deleteUserUseCase.execute(token, userId)
-        return response.json(deleted)
+        const deleted: boolean = await this.deleteUserUseCase.execute(token, userId)
+        if(deleted){
+            response.status(200)
+            return response.send("Motorista deletado com sucesso")
+        }else{
+            response.status(406)
+            return response.send("Motorista não encontrado, ou acesso não permitido")
+        }
+        
     }
 }

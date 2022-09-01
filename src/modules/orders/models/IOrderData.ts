@@ -5,6 +5,6 @@ export default interface IOrderData{
     value: number
     status: string
     client: string
-    km: string
+    km: number
     driver: string
 }

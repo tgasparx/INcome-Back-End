@@ -22,6 +22,12 @@ import IListEmployees from "../modules/companies/models/IListEmployees";
 import ICompanySummary from "../modules/companies/models/ICompanySummary";
 import IDatabase from "./IDatabase";
 import ICompanyAuthData from "../modules/companies/models/ICompanyAuthData";
+import IChangePasswordData from "../modules/companies/models/IChangePasswordData";
+import IOrderData from "../modules/orders/models/IOrderData";
+import IEditOrderData from "../modules/orders/models/IEditOrderData";
+import IEditExpenseData from "../modules/expenses/models/IEditExpenseData";
+import IExpenseData from "../modules/expenses/models/IExpenseData";
+import IEditUserData from "../modules/users/models/IEditUserData";
 
 
 export default class Database implements IDatabase {
@@ -30,9 +36,9 @@ export default class Database implements IDatabase {
 
 
   // START COMPANIES
-  async getCompanyIdByToken(token: string): Promise<string> {
+  async getCompanyIdByToken(token: string): Promise<string | ""> {
     try {
-      const referedCompanyIdByToken = await myDataSource.getRepository(CompanyAuth).findBy({ token: Like(`${token}`) })
+      const referedCompanyIdByToken: CompanyAuth[] = await myDataSource.getRepository(CompanyAuth).findBy({ token: Like(`${token}`) })
       console.log("loggedCompanyId", referedCompanyIdByToken)
       if (referedCompanyIdByToken.length !== 0) {
         const companyId = referedCompanyIdByToken[0].company
@@ -46,9 +52,8 @@ export default class Database implements IDatabase {
     }
   }
   async listAllCompanies(): Promise<Companies[] | false> {
-    const teste = "teste"
     try {
-      const companies = await myDataSource
+      const companies: Companies[] = await myDataSource
         .getRepository(Companies).find()
 
       return companies
@@ -93,11 +98,9 @@ export default class Database implements IDatabase {
       return result
     }
     try {
-
       const referedCompany: Companies[] | undefined = await myDataSource
         .getRepository(Companies).findBy({ email: Like(`${email}`) })
       const isTrueUser = (referedCompany: Companies[] | undefined) => referedCompany[0] ? executeCompare(referedCompany) : false
-
       if (isTrueUser(referedCompany)) { //SE A COMPARAÇÃO DO HASH COM A SENHA INFORMADA FOR TRUE
         const token = jwt.sign({ name: referedCompany[0].name, email: referedCompany[0].email }, "secretKEYTOKEN")
         const authData = {
@@ -180,23 +183,32 @@ export default class Database implements IDatabase {
 
   }
   async deleteCompany(token: string, password: string): Promise<boolean> {
-    const companyId = await this.getCompanyIdByToken(token)
-    const referedCompany = await myDataSource
-      .getRepository(Companies).findBy({ id: Like(`${companyId}`) })
-    const isTrueUser = await compare(password, referedCompany[0].password)
+    const companyId: string | "" = await this.getCompanyIdByToken(token)
+    try {
+      const referedCompany: Companies[] = await myDataSource
+        .getRepository(Companies).findBy({ id: Like(`${companyId}`) })
+      const isTrueUser: boolean = await compare(password, referedCompany[0].password)
+      if (companyId) {
 
-    if (isTrueUser) {
-      console.log("token", token, companyId, password)
-      const deleted = await myDataSource.getRepository(Companies).createQueryBuilder().delete().from(Companies).where("id = :id", { id: `${companyId}` })
-        .execute()
-      console.log("deleted", deleted)
-      return true
-    } else {
+        if (isTrueUser) {
+          console.log("token", token, companyId, password)
+          const deleted = await myDataSource.getRepository(Companies).createQueryBuilder().delete().from(Companies).where("id = :id", { id: `${companyId}` })
+            .execute()
+          console.log("deleted", deleted)
+          return true
+        } else {
+          return false
+        }
+      } else {
+        return false
+      }
+    } catch (error) {
       return false
     }
+
   }
   async companySummary(token: string): Promise<ICompanySummary | false> {
-    const companyId = await this.getCompanyIdByToken(token)
+    const companyId: string | "" = await this.getCompanyIdByToken(token)
     if (companyId) {
       try {
         const referedCompanyById: Companies[] = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
@@ -227,142 +239,194 @@ export default class Database implements IDatabase {
 
 
   }
-  async listCompanyEmployees(token: string): Promise<IListEmployees | boolean> {
+  async listCompanyEmployees(token: string): Promise<IListEmployees | false> {
     const companyId = await this.getCompanyIdByToken(token)
     if (companyId) {
-      console.log(token)
-      const employees = await myDataSource.getRepository(Users).findBy({ company: Like(`${companyId}`) })
-      const companyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
-      const templateCompanyEmployees = {
-        company_name: companyById[0].name,
-        employees: {
-          page: 1,
-          perPage: 20,
-          total_records: employees.length,
-          all_employees: employees
+      try {
+        const employees = await myDataSource.getRepository(Users).findBy({ company: Like(`${companyId}`) })
+        const companyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
+        const templateCompanyEmployees: IListEmployees = {
+          company_name: companyById[0].name,
+          employees: {
+            page: 1,
+            perPage: 20,
+            total_records: employees.length,
+            all_employees: employees
+          }
         }
+        return templateCompanyEmployees
+      } catch (error) {
+        return false
       }
-      return templateCompanyEmployees
     } else {
       return false
     }
 
 
   }
-  async companyData(token: string): Promise<ICompany> {
-    const companyIdByToken = await this.getCompanyIdByToken(token)
-    const data = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyIdByToken}`) })
-    return data[0]
-  }
-  async changePassword({ password, newPassword }: any, token: string): Promise<boolean> {
-    const companyIdByToken = await this.getCompanyIdByToken(token)
-    const company = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyIdByToken}`) })
-    const isTrueUser = await compare(password, company[0].password)
-    if (isTrueUser) {
-      const newHash = await hash(newPassword, 10)
-      const changed = myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ password: newHash }).where("id = :id", { id: companyIdByToken })
-        .execute()
-      return true
+  async companyData(token: string): Promise<ICompany | false> {
+    const companyIdByToken: string | "" = await this.getCompanyIdByToken(token)
+
+    if (companyIdByToken) {
+      try {
+        const data: Companies[] = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyIdByToken}`) })
+        return data[0]
+      } catch (error) {
+        return false
+      }
+    } else {
+      return false
     }
-    return false
+
+  }
+  async changePassword({ password, newPassword }: IChangePasswordData, token: string): Promise<boolean> {
+    const companyIdByToken: string | "" = await this.getCompanyIdByToken(token)
+    if (companyIdByToken) {
+      try {
+        const company = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyIdByToken}`) })
+        const isTrueUser = await compare(password, company[0].password)
+        if (isTrueUser) {
+          const newHash = await hash(newPassword, 10)
+          const changed = myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ password: newHash }).where("id = :id", { id: companyIdByToken })
+            .execute()
+          return true
+        }
+        return false
+      } catch (error) {
+        return false
+      }
+    } else {
+      return false
+    }
+
   }
   // END COMPANIES
   // START EXPENSES
-  async createExpense({ status, value, description }: any, token: string): Promise<boolean> {
+  async createExpense({ status, value, description }: IExpenseData, token: string): Promise<boolean> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
     if (companyIdByToken) {
-      const newExpense = {
-        expense_id: `${(Math.random() * (Math.random()) * 1000)}`,
-        owner_company: companyIdByToken,
-        description: description,
-        status: status,
-        value: parseInt(value),
+      try {
+        const newExpense = {
+          expense_id: `${(Math.random() * (Math.random()) * 1000)}`,
+          owner_company: companyIdByToken,
+          description: description,
+          status: status,
+          value: parseInt(value),
+        }
+        const create = await myDataSource.getRepository(Expense).create(newExpense)
+        const created = await myDataSource.getRepository(Expense).save(create)
+        return true
+      } catch (error) {
+        return false
       }
-      const create = await myDataSource.getRepository(Expense).create(newExpense)
-      const created = await myDataSource.getRepository(Expense).save(create)
-      return true
     } else {
       return false
     }
 
   }
-  async editExpense({ description, value, status }: any, expenseId: string, token: string): Promise<boolean> {
-    console.log(description, value, status, expenseId, token)
+  async editExpense({ description, value, status }: IEditExpenseData, expenseId: string, token: string): Promise<boolean> {
     const userId = this.getUserIdByToken(token)
-    console.log(userId)
     if (userId) {
-      const edited = await myDataSource.getRepository(Expense).createQueryBuilder().update(Expense).set({ description, value, status }).where("expense_id = :id", { id: expenseId })
-        .execute()
-      return true
+      try {
+        const edited = await myDataSource.getRepository(Expense).createQueryBuilder().update(Expense).set({ description, value, status }).where("expense_id = :id", { id: expenseId })
+          .execute()
+        return true
+      } catch (error) {
+        return false
+      }
     } else {
       return false
     }
   }
-  async listExpenses(token: string): Promise<IListExpense> {
+  async listExpenses(token: string): Promise<IListExpense | false> {
     const companyId = await this.getCompanyIdByToken(token)
-    const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
-    console.log("referedbyId", referedCompanyById[0])
-    const companyExpenses = await myDataSource.getRepository(Expense).findBy({ owner_company: Like(`${companyId}`) })
-    console.log("companyOrders", companyExpenses)
-    const templateSummary = {
-      expenses_summary: {
-        page: 1,
-        perPage: 20,
-        total_records: companyExpenses.length,
-        all_expenses: companyExpenses
+    if (companyId) {
+      try {
+        const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
+        console.log("referedbyId", referedCompanyById[0])
+        const companyExpenses = await myDataSource.getRepository(Expense).findBy({ owner_company: Like(`${companyId}`) })
+        console.log("companyOrders", companyExpenses)
+        const templateSummary = {
+          expenses_summary: {
+            page: 1,
+            perPage: 20,
+            total_records: companyExpenses.length,
+            all_expenses: companyExpenses
+          }
+        }
+        return templateSummary
+      } catch (error) {
+        return false
       }
+    } else {
+      return false
     }
-    return templateSummary
   }
   async deleteExpense(expenseId: string, token: string): Promise<boolean> {
     const companyId = await this.getCompanyIdByToken(token)
     if (companyId) {
-      const deleted = await myDataSource.getRepository(Expense).createQueryBuilder().delete().from(Order).where("expense_id = :id", { id: Like(`${expenseId}`) })
-        .execute()
-      return true
+      try {
+        const deleted = await myDataSource.getRepository(Expense).createQueryBuilder().delete().from(Order).where("expense_id = :id", { id: Like(`${expenseId}`) })
+          .execute()
+        return true
+      } catch (error) {
+        return false
+      }
     } else {
       return false
     }
   }
   // END EXPENSES
   // START ORDERS
-  async createOrder({ status, value, description, client, km, driver }: any, token: string): Promise<boolean> {
+  async createOrder({ status, value, description, client, km, driver }: IOrderData, token: string): Promise<boolean> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
     if (companyIdByToken) {
-      const newOrder = {
-        order_id: `${(Math.random() * (Math.random()) * 1000)}`,
-        owner_company: companyIdByToken,
-        description: description,
-        client,
-        km,
-        driver,
-        status: status,
-        value: parseInt(value),
-      }
-      const create = await myDataSource.getRepository(Order).create(newOrder)
-      const created = await myDataSource.getRepository(Order).save(create)
+      try {
+        const newOrder = {
+          order_id: `${(Math.random() * (Math.random()) * 1000)}`,
+          owner_company: companyIdByToken,
+          description: description,
+          client,
+          km,
+          driver,
+          status: status,
+          value,
+        }
+        const create = await myDataSource.getRepository(Order).create(newOrder)
+        const created = await myDataSource.getRepository(Order).save(create)
 
-      return true
+        return true
+      } catch (error) {
+        return false
+      }
     } else {
       return false
     }
 
 
   }
-  async editOrder({ description, value, status, driver, km }: any, orderId: string, token: string): Promise<boolean> {
+  async editOrder({ description, value, status, driver, km }: IEditOrderData, orderId: string, token: string): Promise<boolean> {
     const userId = this.getUserIdByToken(token)
     if (userId) {
-      console.log(userId)
-      const edited = await myDataSource.getRepository(Order).createQueryBuilder().update(Order).set({ description, value, status, driver, km }).where("order_id = :id", { id: orderId })
-        .execute()
-      return true
+   try {
+    console.log(userId)
+    const kmnumber = parseInt(km)
+    const valuenumber = parseInt(value)
+
+    const edited = await myDataSource.getRepository(Order).createQueryBuilder().update(Order).set({ description, value: valuenumber, status, driver, km: kmnumber }).where("order_id = :id", { id: orderId })
+      .execute()
+    return true
+   } catch (error) {
+    return false
+   }
     } else {
       return false
     }
   }
-  async listOrders(token: string): Promise<IListOrder | boolean> {
+  async listOrders(token: string): Promise<IListOrder | false> {
     const companyId = await this.getCompanyIdByToken(token)
     if (companyId) {
+    try {
       const companyOrders = await myDataSource.getRepository(Order).findBy({ owner_company: Like(`${companyId}`) })
       const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
       const templateSummary = {
@@ -374,6 +438,9 @@ export default class Database implements IDatabase {
         }
       }
       return templateSummary
+    } catch (error) {
+     return false 
+    }
     } else {
       return false
     }
@@ -381,9 +448,13 @@ export default class Database implements IDatabase {
   async deleteOrder(orderId: string, token: string): Promise<boolean> {
     const companyId = await this.getCompanyIdByToken(token)
     if (companyId) {
-      const deleted = await myDataSource.getRepository(Order).createQueryBuilder().delete().from(Order).where("order_id = :id", { id: Like(`${orderId}`) })
-        .execute()
-      return true
+      try {
+        const deleted = await myDataSource.getRepository(Order).createQueryBuilder().delete().from(Order).where("order_id = :id", { id: Like(`${orderId}`) })
+          .execute()
+        return true
+      } catch (error) {
+        return false
+      }
     } else {
       return false
     }
@@ -392,52 +463,57 @@ export default class Database implements IDatabase {
   // END ORDERS
 
   // START USERS
-  async getUserIdByToken(token: string): Promise<string> {
+  async getUserIdByToken(token: string): Promise<string | ""> {
     try {
-      let companyId
       const referedUserIdByToken = await myDataSource.getRepository(UserAuth).findBy({ token: Like(`${token}`) })
-      console.log("loggedCompanyId", referedUserIdByToken)
       if (referedUserIdByToken.length !== 0) {
-        companyId = referedUserIdByToken[0].user
-        return companyId
+        return referedUserIdByToken[0].user
       } else {
         return ""
       }
     } catch (error) {
-      console.log(error)
       return ""
     }
   }
-  async listAllUsers(): Promise<IUser[]> {
-    const users = await myDataSource.getRepository(Users).find()
-    return users
+  async listAllUsers(): Promise<IUser[] | false> {
+   try {
+    const users: IUser[] = await myDataSource.getRepository(Users).find()
+    if(users[0]){
+      return users
+    }else{
+      return false
+    }
+   } catch (error) {
+    return false
+   }
+  
 
   }
   async createUser({ name, email, password, cpf }: IUserData, token: string): Promise<boolean> {
-    const companyId = await this.getCompanyIdByToken(token)
-    const hashedPassword = await hash(password, 10)
-    const isOkUserData = {
-      id: `${(Math.random() * (Math.random()) * 1000)}`,
-      name,
-      email,
-      password: hashedPassword,
-      company: companyId,
-      cpf
-    }
-
-    try {
-
-      const create = await myDataSource.getRepository(Users).create(isOkUserData)
-      const created = await myDataSource.getRepository(Users).save(create)
-      return true
-
-
-    } catch (error) {
-      console.log(error)
+    const companyId: string | "" = await this.getCompanyIdByToken(token)
+    if(companyId){
+      try {
+        const hashedPassword = await hash(password, 10)
+        const isOkUserData = {
+          id: `${(Math.random() * (Math.random()) * 1000)}`,
+          name,
+          email,
+          password: hashedPassword,
+          company: companyId,
+          cpf
+        }
+          const create = await myDataSource.getRepository(Users).create(isOkUserData)
+          const created = await myDataSource.getRepository(Users).save(create)
+          return true
+      } catch (error) {
+        return false
+      }
+    }else{
       return false
     }
+
   }
-  async editUser({ name, email, password, cpf }: any, token: string, userId: string): Promise<boolean> {
+  async editUser({ name, email, password, cpf }: IEditUserData, token: string, userId: string): Promise<boolean> {
     try {
       const companyIdByToken = await this.getCompanyIdByToken(token)
       const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, email, password, cpf }).where("id = :id", { id: userId })
@@ -447,95 +523,121 @@ export default class Database implements IDatabase {
     }
     return true
   }
-  async userAuth({ email, password }): Promise<IUserAuthResponse | boolean> {
-    try {
-      const referedUser = await myDataSource
-        .getRepository(Users).findBy({ email: Like(`${email}`) })
-      const isTrueUser = await compare(password, referedUser[0].password)
-      if (isTrueUser) { //SE COMPANHIA E SENHA FOREM TRUE
-        const token = jwt.sign({ name: referedUser[0].name, email: referedUser[0].email }, "secretKEYTOKEN")
-        const authData = {
-          user_name: referedUser[0].name,
-          token: token,
-          user: referedUser[0].id,
-          type: "Bearer"
-        }
-        const isExistsAuthData = await myDataSource.getRepository(CompanyAuth).findBy({ company: Like(`${referedUser[0].id}`) })
-        const isAuthResponse = {
-          id: referedUser[0].id,
-          name: referedUser[0].name,
-          email: referedUser[0].email,
-          created_at: referedUser[0].created_at,
-          token: {
-            type: "Bearer",
-            tokenHash: token
+  async userAuth({ email, password }): Promise<IUserAuthResponse | false> {
+    const referedUser = await myDataSource
+      .getRepository(Users).findBy({ email: Like(`${email}`) })
+    if (referedUser[0]) {
+      try {
+
+        const isTrueUser = await compare(password, referedUser[0].password)
+        if (isTrueUser) { //SE COMPANHIA E SENHA FOREM TRUE
+          const token = jwt.sign({ name: referedUser[0].name, email: referedUser[0].email }, "secretKEYTOKEN")
+          const authData = {
+            user_name: referedUser[0].name,
+            token: token,
+            user: referedUser[0].id,
+            type: "Bearer"
           }
-        }
-        if (!isExistsAuthData[0]) { // SE REGISTRO DA COMPANHIA AINDA NÃO EXISTIR NA TABELA COMPANY AUTH
-          const prepareLogin = await myDataSource.getRepository(UserAuth).create(authData)
-          const logged = await myDataSource.getRepository(UserAuth).save(prepareLogin)
-          return isAuthResponse
-        } else {
-          const newToken = jwt.sign({ name: referedUser[0].name, email: referedUser[0].email }, "secretKEYTOKEN")
-          const updatedToken = await myDataSource.getRepository(UserAuth).createQueryBuilder().update(UserAuth).set({ token: newToken }).where("user = :user", { user: referedUser[0].id })
-            .execute()
-          const isAuthUpdatedResponse = {
+          const isExistsAuthData = await myDataSource.getRepository(CompanyAuth).findBy({ company: Like(`${referedUser[0].id}`) })
+          const isAuthResponse = {
             id: referedUser[0].id,
             name: referedUser[0].name,
             email: referedUser[0].email,
             created_at: referedUser[0].created_at,
             token: {
               type: "Bearer",
-              tokenHash: newToken
+              tokenHash: token
             }
           }
-          return isAuthUpdatedResponse
+          if (!isExistsAuthData[0]) { // SE REGISTRO DA COMPANHIA AINDA NÃO EXISTIR NA TABELA COMPANY AUTH
+            const prepareLogin = await myDataSource.getRepository(UserAuth).create(authData)
+            const logged = await myDataSource.getRepository(UserAuth).save(prepareLogin)
+            return isAuthResponse
+          } else {
+            const newToken = jwt.sign({ name: referedUser[0].name, email: referedUser[0].email }, "secretKEYTOKEN")
+            const updatedToken = await myDataSource.getRepository(UserAuth).createQueryBuilder().update(UserAuth).set({ token: newToken }).where("user = :user", { user: referedUser[0].id })
+              .execute()
+            const isAuthUpdatedResponse = {
+              id: referedUser[0].id,
+              name: referedUser[0].name,
+              email: referedUser[0].email,
+              created_at: referedUser[0].created_at,
+              token: {
+                type: "Bearer",
+                tokenHash: newToken
+              }
+            }
+            return isAuthUpdatedResponse
+          }
+        } else {
+          return false
         }
-      } else {
+      } catch (error) {
+        console.log(error)
         return false
       }
-    } catch (error) {
-      console.log(error)
-      return false
-    }
-    // return {ok: "OK"}
-  }
-  async userSummary(token: string): Promise<IUserSummary> {
-    const userId = await this.getUserIdByToken(token)
-    const userOrders = await myDataSource.getRepository(Order).findBy({ driver: Like(`${userId}`) })
-    console.log(userOrders)
-    let totalKm: number = 0
-    for (let i = 0; i < userOrders.length; i++) {
-      totalKm = totalKm + userOrders[i].km
-    }
-    //   const totalKm = userOrders.reduce((prev , curr): any => {
-    //     return prev.km + curr.km 
-    //  })
-    const templateSummary = {
-      total_km: totalKm,
-      total_pedidos: userOrders.length,
-      total_pedidos_finalizados: userOrders.filter((e) => e.status === "Concluída").length
-    }
-    return templateSummary
-  }
-  async userData(token: string): Promise<IUser | boolean> {
-    try {
-      const userIdByToken = await this.getUserIdByToken(token)
-      const userData = await myDataSource.getRepository(Users).findBy({ id: Like(`${userIdByToken}`) })
-      return userData[0]
-    } catch (error) {
+    } else {
       return false
     }
 
+    // return {ok: "OK"}
   }
-  async deleteUser(token: string, userId: string): Promise<boolean> {
-    try {
-      const companyIdByToken = await this.getCompanyIdByToken(token)
-      const deleted = await myDataSource.getRepository(Users).createQueryBuilder().delete().from(Users).where("id = :id", { id: `${userId}` })
-        .execute()
-    } catch (error) {
+  async userSummary(token: string): Promise<IUserSummary | false> {
+    const userId = await this.getUserIdByToken(token)
+    if (userId) {
+      try {
+        const userOrders = await myDataSource.getRepository(Order).findBy({ driver: Like(`${userId}`) })
+        console.log(userOrders)
+        let totalKm: number = 0
+        for (let i = 0; i < userOrders.length; i++) {
+          totalKm = totalKm + userOrders[i].km
+        }
+        //   const totalKm = userOrders.reduce((prev , curr): any => {
+        //     return prev.km + curr.km 
+        //  })
+        const templateSummary = {
+          total_km: totalKm,
+          total_pedidos: userOrders.length,
+          total_pedidos_finalizados: userOrders.filter((e) => e.status === "Concluída").length
+        }
+        return templateSummary
+      } catch (error) {
+        return false
+      }
+    } else {
       return false
     }
-    return true
+  }
+  async userData(token: string): Promise<IUser | false> {
+    const userIdByToken = await this.getUserIdByToken(token)
+    if (userIdByToken) {
+      try {
+
+        const userData = await myDataSource.getRepository(Users).findBy({ id: Like(`${userIdByToken}`) })
+        return userData[0]
+      } catch (error) {
+        return false
+      }
+    } else {
+      return false
+    }
+
+
+  }
+  async deleteUser(token: string, userId: string): Promise<boolean> {
+    const companyIdByToken: string | "" = await this.getCompanyIdByToken(token)
+    if (companyIdByToken) {
+      try {
+
+        const deleted = await myDataSource.getRepository(Users).createQueryBuilder().delete().from(Users).where("id = :id", { id: `${userId}` })
+          .execute()
+        return true
+      } catch (error) {
+        return false
+      }
+    } else {
+      return false
+    }
+
   }
 }
