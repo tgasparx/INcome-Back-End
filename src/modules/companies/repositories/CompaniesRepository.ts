@@ -16,7 +16,7 @@ export default class CompaniesRepository implements ICompaniesRepository{
         this.database = database
     }
 
-    async listAllCompanies(): Promise<Companies[] | boolean>  {
+    async listAllCompanies(): Promise<Companies[] | false>  {
         const allCompanies = await this.database.listAllCompanies()
         return allCompanies
     }
@@ -37,7 +37,7 @@ export default class CompaniesRepository implements ICompaniesRepository{
         return deleted
     }
    
-    async companySummary(token: string): Promise<ICompanySummary | boolean> {
+    async companySummary(token: string): Promise<ICompanySummary | false> {
         const summary = await this.database.companySummary(token)
         return summary
     }

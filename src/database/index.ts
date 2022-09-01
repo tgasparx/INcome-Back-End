@@ -8,20 +8,20 @@ import { Like } from "typeorm";
 import { compare, hash } from 'bcrypt'
 import { Order } from "./Models/order.entity";
 import { Expense } from "./Models/expense.entity";
-import ICompanyData from "../models/companies/models/ICompanyData";
-import ICompanyAuthReponse from "../models/companies/models/ICompanyAuthResponse";
-import IEditCompanyData from "../models/companies/models/IEditCompanyData";
-import IUserData from "../models/users/models/IUserData";
-import IUser from "../models/users/models/IUser";
-import IUserAuthResponse from "../models/users/models/IUserAuthResponse";
-import IUserSummary from "../models/users/models/IUserSummary";
-import IListExpense from "../models/expenses/models/IListExpense";
-import IListOrder from "../models/orders/models/IListOrder";
-import ICompany from "../models/companies/models/ICompany";
-import IListEmployees from "../models/companies/models/IListEmployees";
-import ICompanySummary from "../models/companies/models/ICompanySummary";
+import ICompanyData from "../modules/companies/models/ICompanyData";
+import ICompanyAuthReponse from "../modules/companies/models/ICompanyAuthResponse";
+import IEditCompanyData from "../modules/companies/models/IEditCompanyData";
+import IUserData from "../modules/users/models/IUserData";
+import IUser from "../modules/users/models/IUser";
+import IUserAuthResponse from "../modules/users/models/IUserAuthResponse";
+import IUserSummary from "../modules/users/models/IUserSummary";
+import IListExpense from "../modules/expenses/models/IListExpense";
+import IListOrder from "../modules/orders/models/IListOrder";
+import ICompany from "../modules/companies/models/ICompany";
+import IListEmployees from "../modules/companies/models/IListEmployees";
+import ICompanySummary from "../modules/companies/models/ICompanySummary";
 import IDatabase from "./IDatabase";
-import ICompanyAuthData from "../models/companies/models/ICompanyAuthData";
+import ICompanyAuthData from "../modules/companies/models/ICompanyAuthData";
 
 
 export default class Database implements IDatabase {
@@ -35,7 +35,7 @@ export default class Database implements IDatabase {
       const referedCompanyIdByToken = await myDataSource.getRepository(CompanyAuth).findBy({ token: Like(`${token}`) })
       console.log("loggedCompanyId", referedCompanyIdByToken)
       if (referedCompanyIdByToken.length !== 0) {
-       const companyId = referedCompanyIdByToken[0].company
+        const companyId = referedCompanyIdByToken[0].company
         return companyId
       } else {
         return ""
@@ -88,18 +88,16 @@ export default class Database implements IDatabase {
 
   }
   async companyAuth({ email, password }: ICompanyAuthData): Promise<ICompanyAuthReponse | false> {
-    const confereEmail = email
-    const conferePassword = password
-    async function executeCompare(referedCompany: Companies[] | undefined){
-      const result: boolean =  await compare(password, referedCompany[0].password)
+    async function executeCompare(referedCompany: Companies[] | undefined) {
+      const result: boolean = await compare(password, referedCompany[0].password)
       return result
-     }
+    }
     try {
-      
+
       const referedCompany: Companies[] | undefined = await myDataSource
         .getRepository(Companies).findBy({ email: Like(`${email}`) })
-      const isTrueUser = (referedCompany: Companies[] | undefined) =>  referedCompany[0] ?  executeCompare(referedCompany) : false
- 
+      const isTrueUser = (referedCompany: Companies[] | undefined) => referedCompany[0] ? executeCompare(referedCompany) : false
+
       if (isTrueUser(referedCompany)) { //SE A COMPARAÇÃO DO HASH COM A SENHA INFORMADA FOR TRUE
         const token = jwt.sign({ name: referedCompany[0].name, email: referedCompany[0].email }, "secretKEYTOKEN")
         const authData = {
@@ -152,7 +150,6 @@ export default class Database implements IDatabase {
       const companyId = await this.getCompanyIdByToken(token)
       const isCnpjAlreadyExists = await myDataSource.getRepository(Companies).findBy({ cnpj: Like(`${cnpj}`) })
       const isEmailAlreadyExists = await myDataSource.getRepository(Companies).findBy({ email: Like(`${email}`) })
-      console.log("isalreadyexists", isCnpjAlreadyExists)
       if (companyId) {
         if (!isCnpjAlreadyExists[0] && !isEmailAlreadyExists[0]) {
           const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email, cnpj: cnpj }).where("id = :id", { id: companyId })
@@ -170,9 +167,7 @@ export default class Database implements IDatabase {
             const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name }).where("id = :id", { id: companyId })
               .execute()
           }
-
         }
-
         return true
       } else {
         return false
@@ -200,28 +195,32 @@ export default class Database implements IDatabase {
       return false
     }
   }
-  async companySummary(token: string): Promise<ICompanySummary | boolean> {
+  async companySummary(token: string): Promise<ICompanySummary | false> {
     const companyId = await this.getCompanyIdByToken(token)
     if (companyId) {
-      const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
-      const companyOrders = await myDataSource.getRepository(Order).findBy({ owner_company: Like(`${companyId}`) })
-      const companyExpenses = await myDataSource.getRepository(Expense).findBy({ owner_company: Like(`${companyId}`) })
-      const templateSummary = {
-        company_name: referedCompanyById[0].name,
-        orders_summary: {
-          page: 1,
-          perPage: 20,
-          total_records: companyOrders.length,
-          all_orders: companyOrders
-        },
-        expenses_summary: {
-          page: 1,
-          perPage: 20,
-          total_records: companyExpenses.length,
-          all_expenses: companyExpenses
+      try {
+        const referedCompanyById: Companies[] = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
+        const companyOrders: Order[] = await myDataSource.getRepository(Order).findBy({ owner_company: Like(`${companyId}`) })
+        const companyExpenses: Expense[] = await myDataSource.getRepository(Expense).findBy({ owner_company: Like(`${companyId}`) })
+        const templateSummary: ICompanySummary = {
+          company_name: referedCompanyById[0].name,
+          orders_summary: {
+            page: 1,
+            perPage: 20,
+            total_records: companyOrders.length,
+            all_orders: companyOrders
+          },
+          expenses_summary: {
+            page: 1,
+            perPage: 20,
+            total_records: companyExpenses.length,
+            all_expenses: companyExpenses
+          }
         }
+        return templateSummary
+      } catch (error) {
+        return false
       }
-      return templateSummary
     } else {
       return false
     }
@@ -268,64 +267,64 @@ export default class Database implements IDatabase {
     return false
   }
   // END COMPANIES
-    // START EXPENSES
-    async createExpense({ status, value, description }: any, token: string): Promise<boolean> {
-      const companyIdByToken = await this.getCompanyIdByToken(token)
-      if (companyIdByToken) {
-        const newExpense = {
-          expense_id: `${(Math.random() * (Math.random()) * 1000)}`,
-          owner_company: companyIdByToken,
-          description: description,
-          status: status,
-          value: parseInt(value),
-        }
-        const create = await myDataSource.getRepository(Expense).create(newExpense)
-        const created = await myDataSource.getRepository(Expense).save(create)
-        return true
-      } else {
-        return false
+  // START EXPENSES
+  async createExpense({ status, value, description }: any, token: string): Promise<boolean> {
+    const companyIdByToken = await this.getCompanyIdByToken(token)
+    if (companyIdByToken) {
+      const newExpense = {
+        expense_id: `${(Math.random() * (Math.random()) * 1000)}`,
+        owner_company: companyIdByToken,
+        description: description,
+        status: status,
+        value: parseInt(value),
       }
-  
+      const create = await myDataSource.getRepository(Expense).create(newExpense)
+      const created = await myDataSource.getRepository(Expense).save(create)
+      return true
+    } else {
+      return false
     }
-    async editExpense({ description, value, status }: any, expenseId: string, token: string): Promise<boolean> {
-      console.log(description, value, status, expenseId, token)
-      const userId = this.getUserIdByToken(token)
-      console.log(userId)
-      if (userId) {
-        const edited = await myDataSource.getRepository(Expense).createQueryBuilder().update(Expense).set({ description, value, status }).where("expense_id = :id", { id: expenseId })
-          .execute()
-        return true
-      } else {
-        return false
-      }
+
+  }
+  async editExpense({ description, value, status }: any, expenseId: string, token: string): Promise<boolean> {
+    console.log(description, value, status, expenseId, token)
+    const userId = this.getUserIdByToken(token)
+    console.log(userId)
+    if (userId) {
+      const edited = await myDataSource.getRepository(Expense).createQueryBuilder().update(Expense).set({ description, value, status }).where("expense_id = :id", { id: expenseId })
+        .execute()
+      return true
+    } else {
+      return false
     }
-    async listExpenses(token: string): Promise<IListExpense> {
-      const companyId = await this.getCompanyIdByToken(token)
-      const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
-      console.log("referedbyId", referedCompanyById[0])
-      const companyExpenses = await myDataSource.getRepository(Expense).findBy({ owner_company: Like(`${companyId}`) })
-      console.log("companyOrders", companyExpenses)
-      const templateSummary = {
-        expenses_summary: {
-          page: 1,
-          perPage: 20,
-          total_records: companyExpenses.length,
-          all_expenses: companyExpenses
-        }
-      }
-      return templateSummary
-    }
-    async deleteExpense(expenseId: string, token: string): Promise<boolean> {
-      const companyId = await this.getCompanyIdByToken(token)
-      if (companyId) {
-        const deleted = await myDataSource.getRepository(Expense).createQueryBuilder().delete().from(Order).where("expense_id = :id", { id: Like(`${expenseId}`) })
-          .execute()
-        return true
-      } else {
-        return false
+  }
+  async listExpenses(token: string): Promise<IListExpense> {
+    const companyId = await this.getCompanyIdByToken(token)
+    const referedCompanyById = await myDataSource.getRepository(Companies).findBy({ id: Like(`${companyId}`) })
+    console.log("referedbyId", referedCompanyById[0])
+    const companyExpenses = await myDataSource.getRepository(Expense).findBy({ owner_company: Like(`${companyId}`) })
+    console.log("companyOrders", companyExpenses)
+    const templateSummary = {
+      expenses_summary: {
+        page: 1,
+        perPage: 20,
+        total_records: companyExpenses.length,
+        all_expenses: companyExpenses
       }
     }
-    // END EXPENSES
+    return templateSummary
+  }
+  async deleteExpense(expenseId: string, token: string): Promise<boolean> {
+    const companyId = await this.getCompanyIdByToken(token)
+    if (companyId) {
+      const deleted = await myDataSource.getRepository(Expense).createQueryBuilder().delete().from(Order).where("expense_id = :id", { id: Like(`${expenseId}`) })
+        .execute()
+      return true
+    } else {
+      return false
+    }
+  }
+  // END EXPENSES
   // START ORDERS
   async createOrder({ status, value, description, client, km, driver }: any, token: string): Promise<boolean> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
@@ -439,13 +438,13 @@ export default class Database implements IDatabase {
     }
   }
   async editUser({ name, email, password, cpf }: any, token: string, userId: string): Promise<boolean> {
-   try {
-    const companyIdByToken = await this.getCompanyIdByToken(token)
-    const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, email, password, cpf }).where("id = :id", { id: userId })
-      .execute()
-   } catch (error) {
-    return false
-   }
+    try {
+      const companyIdByToken = await this.getCompanyIdByToken(token)
+      const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, email, password, cpf }).where("id = :id", { id: userId })
+        .execute()
+    } catch (error) {
+      return false
+    }
     return true
   }
   async userAuth({ email, password }): Promise<IUserAuthResponse | boolean> {
@@ -519,24 +518,24 @@ export default class Database implements IDatabase {
     }
     return templateSummary
   }
-  async userData(token: string): Promise<IUser | boolean>{
+  async userData(token: string): Promise<IUser | boolean> {
     try {
       const userIdByToken = await this.getUserIdByToken(token)
-    const userData = await myDataSource.getRepository(Users).findBy({id: Like(`${userIdByToken}`)})
-    return userData[0]
+      const userData = await myDataSource.getRepository(Users).findBy({ id: Like(`${userIdByToken}`) })
+      return userData[0]
     } catch (error) {
       return false
     }
-    
+
   }
   async deleteUser(token: string, userId: string): Promise<boolean> {
-   try {
-    const companyIdByToken = await this.getCompanyIdByToken(token)
-    const deleted = await myDataSource.getRepository(Users).createQueryBuilder().delete().from(Users).where("id = :id", { id: `${userId}` })
-      .execute()
-   } catch (error) {
-    return false
-   }
+    try {
+      const companyIdByToken = await this.getCompanyIdByToken(token)
+      const deleted = await myDataSource.getRepository(Users).createQueryBuilder().delete().from(Users).where("id = :id", { id: `${userId}` })
+        .execute()
+    } catch (error) {
+      return false
+    }
     return true
   }
 }

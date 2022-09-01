@@ -4,5 +4,5 @@ import { ICompaniesRepository } from "../repositories/ICompaniesRepository";
 
 export default class ICompanyEditUseCase{
     companiesRepository: ICompaniesRepository
-    execute: ({}:IEditCompanyData, token: string) => Promise<any>
+    execute: ({}:IEditCompanyData, token: string) => Promise<boolean>
 }
