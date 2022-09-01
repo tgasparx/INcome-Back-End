@@ -21,6 +21,7 @@ import ICompany from "../models/companies/models/ICompany";
 import IListEmployees from "../models/companies/models/IListEmployees";
 import ICompanySummary from "../models/companies/models/ICompanySummary";
 import IDatabase from "./IDatabase";
+import ICompanyAuthData from "../models/companies/models/ICompanyAuthData";
 
 
 export default class Database implements IDatabase {
@@ -44,7 +45,8 @@ export default class Database implements IDatabase {
       return ""
     }
   }
-  async listAllCompanies(): Promise<Companies[] | boolean> {
+  async listAllCompanies(): Promise<Companies[] | false> {
+    const teste = "teste"
     try {
       const companies = await myDataSource
         .getRepository(Companies).find()
@@ -85,12 +87,20 @@ export default class Database implements IDatabase {
     }
 
   }
-  async companyAuth({ email, password }): Promise<ICompanyAuthReponse | false> {
+  async companyAuth({ email, password }: ICompanyAuthData): Promise<ICompanyAuthReponse | false> {
+    const confereEmail = email
+    const conferePassword = password
+    async function executeCompare(referedCompany: Companies[] | undefined){
+      const result: boolean =  await compare(password, referedCompany[0].password)
+      return result
+     }
     try {
-      const referedCompany = await myDataSource
+      
+      const referedCompany: Companies[] | undefined = await myDataSource
         .getRepository(Companies).findBy({ email: Like(`${email}`) })
-      const isTrueUser = await compare(password, referedCompany[0].password)
-      if (isTrueUser) { //SE COMPANHIA E SENHA FOREM TRUE
+      const isTrueUser = (referedCompany: Companies[] | undefined) =>  referedCompany[0] ?  executeCompare(referedCompany) : false
+ 
+      if (isTrueUser(referedCompany)) { //SE A COMPARAÇÃO DO HASH COM A SENHA INFORMADA FOR TRUE
         const token = jwt.sign({ name: referedCompany[0].name, email: referedCompany[0].email }, "secretKEYTOKEN")
         const authData = {
           company_name: referedCompany[0].name,
@@ -137,7 +147,7 @@ export default class Database implements IDatabase {
       return false
     }
   }
-  async editCompany({ name, email, cnpj }: IEditCompanyData, token: any): Promise<boolean> {
+  async editCompany({ name, email, cnpj }: IEditCompanyData, token: string): Promise<boolean> {
     try {
       const companyId = await this.getCompanyIdByToken(token)
       const isCnpjAlreadyExists = await myDataSource.getRepository(Companies).findBy({ cnpj: Like(`${cnpj}`) })

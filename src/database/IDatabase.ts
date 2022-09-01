@@ -15,7 +15,7 @@ import { Companies } from "./Models/company.entity"
 
 export default interface IDatabase{
     getCompanyIdByToken: (token: string) => Promise<string>
-    listAllCompanies: () => Promise<Companies[] | boolean>
+    listAllCompanies: () => Promise<Companies[] | false>
     createCompany: (companyData: ICompanyData) => Promise<boolean>
     companyAuth: ({ email, password }) => Promise<ICompanyAuthReponse | false>
     editCompany: ({ name, email, cnpj }: IEditCompanyData, token: any) => Promise<boolean>
