@@ -147,9 +147,9 @@ export default class Database implements IDatabase {
   }
   async editCompany({ name, email, cnpj }: IEditCompanyData, token: string): Promise<boolean> {
     try {
-      const companyId = await this.getCompanyIdByToken(token)
-      const isCnpjAlreadyExists = await myDataSource.getRepository(Companies).findBy({ cnpj: Like(`${cnpj}`) })
-      const isEmailAlreadyExists = await myDataSource.getRepository(Companies).findBy({ email: Like(`${email}`) })
+      const companyId: string = await this.getCompanyIdByToken(token)
+      const isCnpjAlreadyExists: Companies[] = await myDataSource.getRepository(Companies).findBy({ cnpj: Like(`${cnpj}`) })
+      const isEmailAlreadyExists: Companies[] = await myDataSource.getRepository(Companies).findBy({ email: Like(`${email}`) })
       if (companyId) {
         if (!isCnpjAlreadyExists[0] && !isEmailAlreadyExists[0]) {
           const updated = await myDataSource.getRepository(Companies).createQueryBuilder().update(Companies).set({ name: name, email: email, cnpj: cnpj }).where("id = :id", { id: companyId })
