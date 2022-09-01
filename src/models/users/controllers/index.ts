@@ -13,26 +13,51 @@ import ListAllUsersUseCase from "../useCases/ListAllUsersUseCase";
 import UserEditUseCase from "../useCases/UserEditUseCase";
 import DeleteUserUseCase from "../useCases/DeleteUserUseCase";
 import UserAuthUseCase from "../useCases/UserAuthUseCase";
-const database = new Database()
-const usersRepository = new UsersRepository(database)
-const createNewUserUseCase = new CreateNewUserUseCase(usersRepository)
-export const createNewUserController = new CreateNewUserController(createNewUserUseCase)
+import UserDataUseCase from "../useCases/UserDataUseCase";
+import IListAllUsersUseCase from "../useCases/IListAllUsersUseCase";
+import IListAllUsersController from "./IListAllUsersController";
+import IUserAuthUseCase from "../useCases/IUserAuthUseCase";
+import IUserEditUseCase from "../useCases/IUserEditUseCase";
+import IDeleteUserUseCase from "../useCases/IDeleteUserUseCase";
+import IDeleteUserController from "./IDeleteUserController";
+import IUserSummaryUseCase from "../useCases/IUserSummaryUserCase";
+import IUserSummaryController from "./IUserSummaryController";
+import IUserDataUseCase from "../useCases/IUserDataUseCase";
+import IUserDataController from "./IUserDataController";
+import IUserAuthController from "./IUserAuthController";
+import IUserEditController from "./IUserEditController";
+import ICreateNewUserController from "./ICreateNewUserController";
+import ICreateNewUserUseCase from "../useCases/ICreateNewUserUseCase";
+import IUsersRepository from "../repositories/IUsersRepository";
+import IDatabase from "../../../database/IDatabase";
 
 
-const listAllUsersUseCase = new ListAllUsersUseCase(usersRepository)
-export const listAllUsersController = new ListAllUsersController(listAllUsersUseCase)
 
-const userAuthUseCase = new UserAuthUseCase(usersRepository)
-export const userAuthController = new UserAuthController(userAuthUseCase)
-
-const userEditUseCase = new UserEditUseCase(usersRepository)
-export const userEditController = new UserEditController(userEditUseCase)
+const database: IDatabase = new Database()
+const usersRepository: IUsersRepository = new UsersRepository(database)
 
 
-const deleteUserUseCase = new DeleteUserUseCase(usersRepository)
-export const deleteUserController = new DeleteUserController(deleteUserUseCase)
 
-const userSummaryUseCase = new UserSummaryUseCase(usersRepository)
-export const userSummaryController = new UserSummaryController(userSummaryUseCase)
 
-export const userDataController = new UserDataController()
+
+const createNewUserUseCase: ICreateNewUserUseCase = new CreateNewUserUseCase(usersRepository)
+export const createNewUserController: ICreateNewUserController = new CreateNewUserController(createNewUserUseCase)
+
+
+const listAllUsersUseCase: IListAllUsersUseCase = new ListAllUsersUseCase(usersRepository)
+export const listAllUsersController: IListAllUsersController = new ListAllUsersController(listAllUsersUseCase)
+
+const userAuthUseCase: IUserAuthUseCase = new UserAuthUseCase(usersRepository)
+export const userAuthController: IUserAuthController = new UserAuthController(userAuthUseCase)
+
+const userEditUseCase: IUserEditUseCase = new UserEditUseCase(usersRepository)
+export const userEditController: IUserEditController = new UserEditController(userEditUseCase)
+
+const deleteUserUseCase: IDeleteUserUseCase = new DeleteUserUseCase(usersRepository)
+export const deleteUserController: IDeleteUserController = new DeleteUserController(deleteUserUseCase)
+
+const userSummaryUseCase: IUserSummaryUseCase = new UserSummaryUseCase(usersRepository)
+export const userSummaryController: IUserSummaryController = new UserSummaryController(userSummaryUseCase)
+
+const userDataUseCase: IUserDataUseCase = new UserDataUseCase(usersRepository)
+export const userDataController: IUserDataController = new UserDataController(userDataUseCase)

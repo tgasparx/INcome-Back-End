@@ -34,6 +34,10 @@ export default class UsersRepository implements IUsersRepository {
         const summary = await this.database.userSummary(token)
         return summary
     }
+    async userData(token: string): Promise<IUser | boolean>{
+        const userData = this.database.userData(token)
+        return userData
+    }
     async deleteUser(token: string, userId: string): Promise<boolean>{
         const deleted = await this.database.deleteUser(token, userId)
         return deleted

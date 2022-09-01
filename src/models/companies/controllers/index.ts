@@ -18,34 +18,53 @@ import DeleteCompanyUseCase from "../useCases/DeleteCompanyUseCase";
 import CompanyEditUseCase from "../useCases/CompanyEditUseCase";
 import ChangePasswordController from "./ChangePasswordController";
 import ChangePasswordUseCase from "../useCases/ChangePasswordUseCase";
-const database = new Database()
+import IDatabase from "../../../database/IDatabase";
+import { ICompaniesRepository } from "../repositories/ICompaniesRepository";
+import IListAllCompaniesUseCase from "../useCases/IListAllCompaniesUseCase";
+import IListAllCompaniesController from "./IListAllCompaniesController";
+import ICompanyAuthUseCase from "../useCases/ICompanyAuthUseCase";
+import ICompanyAuthController from "./ICompanyAythController";
+import ICompanyEditUseCase from "../useCases/ICompanyEditUseCase";
+import ICompanyEditController from "./ICompanyEditController";
+import IDeleteCompanyUseCase from "../useCases/IDeleteCompanyUseCase";
+import IDeleteCompanyController from "./IDeleteCompanyController";
+import ICompanySummaryUseCase from "../useCases/ICompanySummaryUseCase";
+import ICompanySummaryController from "./ICompanySummaryController";
+import ICompanyDataUseCase from "../useCases/ICompanyDataUseCase";
+import ICompanyDataController from "./ICompanyDataController";
+import IListCompanyEmployeesUseCase from "../useCases/IListCompanyEmployeesUseCase";
+import IListCompanyEmployeesController from "./IListCompanyEmployeesController";
+import IChangePasswordUseCase from "../useCases/IChangePasswordUseCase";
+import IChangePasswordController from "./IChangePasswordController";
+
+const database: IDatabase = new Database()
 // START COMPANIES
-const companiesRepository = new CompaniesRepository(database)
+const companiesRepository: ICompaniesRepository = new CompaniesRepository(database)
 
 const createNewCompanyUseCase = new CreateNewCompanyUseCase(companiesRepository)
 export const createNewCompanyController = new CreateNewCompanyController(createNewCompanyUseCase)
 
-const listAllCompaniesUseCase = new ListAllCompaniesUseCase(companiesRepository)
-export const listAllCompaniesController = new ListAllCompaniesController(listAllCompaniesUseCase)
+const listAllCompaniesUseCase: IListAllCompaniesUseCase = new ListAllCompaniesUseCase(companiesRepository)
+export const listAllCompaniesController: IListAllCompaniesController = new ListAllCompaniesController(listAllCompaniesUseCase)
 
-const companyAuthUseCase = new CompanyAuthUseCase(companiesRepository)
-export const companyAuthController = new CompanyAuthController(companyAuthUseCase)
+const companyAuthUseCase: ICompanyAuthUseCase = new CompanyAuthUseCase(companiesRepository)
+export const companyAuthController: ICompanyAuthController = new CompanyAuthController(companyAuthUseCase)
 
-const companyEditUseCase = new CompanyEditUseCase(companiesRepository)
-export const companyEditController = new CompanyEditController(companyEditUseCase)
+const companyEditUseCase: ICompanyEditUseCase = new CompanyEditUseCase(companiesRepository)
+export const companyEditController: ICompanyEditController = new CompanyEditController(companyEditUseCase)
 
-const deleteCompanyUseCase = new DeleteCompanyUseCase(companiesRepository)
-export const deleteCompanyController = new DeleteCompanyController(deleteCompanyUseCase)
+const deleteCompanyUseCase: IDeleteCompanyUseCase = new DeleteCompanyUseCase(companiesRepository)
+export const deleteCompanyController: IDeleteCompanyController = new DeleteCompanyController(deleteCompanyUseCase)
 
-const companySummaryUseCase = new CompanySummaryUseCase(companiesRepository)
-export const companySummaryController = new CompanySummaryController(companySummaryUseCase)
+const companySummaryUseCase: ICompanySummaryUseCase = new CompanySummaryUseCase(companiesRepository)
+export const companySummaryController: ICompanySummaryController = new CompanySummaryController(companySummaryUseCase)
 
-const companyDataUseCase = new CompanyDataUseCase(companiesRepository)
-export const companyDataController = new CompanyDataController(companyDataUseCase)
+const companyDataUseCase: ICompanyDataUseCase = new CompanyDataUseCase(companiesRepository)
+export const companyDataController: ICompanyDataController = new CompanyDataController(companyDataUseCase)
 
-const listCompanyEmployeesUseCase = new ListCompanyEmployeesUseCase(companiesRepository)
-export const listCompanyEmployeesController = new ListCompanyEmployeesController(listCompanyEmployeesUseCase)
+const listCompanyEmployeesUseCase: IListCompanyEmployeesUseCase = new ListCompanyEmployeesUseCase(companiesRepository)
+export const listCompanyEmployeesController: IListCompanyEmployeesController = new ListCompanyEmployeesController(listCompanyEmployeesUseCase)
 
-const changePasswordUseCase = new ChangePasswordUseCase(companiesRepository)
-export const changePasswordController = new ChangePasswordController(changePasswordUseCase)
+const changePasswordUseCase: IChangePasswordUseCase = new ChangePasswordUseCase(companiesRepository)
+export const changePasswordController: IChangePasswordController = new ChangePasswordController(changePasswordUseCase)
 // END COMPANIES

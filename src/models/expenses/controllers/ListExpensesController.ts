@@ -1,8 +1,9 @@
 import { Request, Response } from "express"
 import IListExpensesUsecase from "../useCases/IListExpensesUseCase"
+import IListExpensesController from "./IListExpensesController"
 
 
-export default class ListExpensesController{
+export default class ListExpensesController implements IListExpensesController{
     listExpensesUseCase: IListExpensesUsecase
     constructor(listExpensesUseCase: IListExpensesUsecase){
         this.listExpensesUseCase = listExpensesUseCase

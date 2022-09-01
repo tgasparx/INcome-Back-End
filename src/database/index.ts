@@ -491,8 +491,6 @@ export default class Database implements IDatabase {
     }
     // return {ok: "OK"}
   }
- 
-
   async userSummary(token: string): Promise<IUserSummary> {
     const userId = await this.getUserIdByToken(token)
     const userOrders = await myDataSource.getRepository(Order).findBy({ driver: Like(`${userId}`) })
@@ -510,6 +508,16 @@ export default class Database implements IDatabase {
       total_pedidos_finalizados: userOrders.filter((e) => e.status === "Concluída").length
     }
     return templateSummary
+  }
+  async userData(token: string): Promise<IUser | boolean>{
+    try {
+      const userIdByToken = await this.getUserIdByToken(token)
+    const userData = await myDataSource.getRepository(Users).findBy({id: Like(`${userIdByToken}`)})
+    return userData[0]
+    } catch (error) {
+      return false
+    }
+    
   }
   async deleteUser(token: string, userId: string): Promise<boolean> {
    try {

@@ -40,5 +40,6 @@ export default interface IDatabase{
     editUser: ({ name, email, password, cpf }: any, token: string, userId: string) => Promise<boolean>
     userAuth: ({ email, password }) => Promise<IUserAuthResponse | boolean>
     userSummary: (token: string) => Promise<IUserSummary>
+    userData: (token: string) => Promise<IUser | boolean>
     deleteUser: (token: string, userId: string) => Promise<boolean>
 }
