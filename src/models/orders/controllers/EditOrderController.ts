@@ -9,11 +9,16 @@ export default class EditOrderController implements IEditOrderController {
         this.editOrderUseCase = editOrderUseCase
     }
     async handle(request: Request, response: Response): Promise<Response> {
-        const { description, value, status, driver, km, orderId } = request.body
+        const { description, value, status, client, driver, km, orderId } = request.body
         const { token } = request.params
-        console.log(description, value, status, driver, km, orderId, token)
-        console.log("bateu")
-        const edited = await this.editOrderUseCase.execute({ description, value, status, driver, km }, orderId, token)
+        const edited = await this.editOrderUseCase.execute({ description, value, status, client, driver, km }, orderId, token)
+       if(edited){
+        response.status(202)
         return response.json(edited)
+       }else{
+        response.status(406)
+        response.send("Houve um erro interno")
+       }
+        
     }
 }

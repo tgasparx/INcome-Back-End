@@ -17,7 +17,7 @@ export default class ChangePasswordController implements IChangePasswordControll
             return response.json({message: "Senha alterada", status: "202"})
         }else{
             response.status(406)
-            throw new Error("Senha Incorreta")
+           return response.send("Senha incorreta")
         }
         
     }
