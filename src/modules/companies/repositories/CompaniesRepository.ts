@@ -55,4 +55,8 @@ export default class CompaniesRepository implements ICompaniesRepository {
         const changed = await this.database.changePassword({ password, newPassword }, token)
         return changed
     }
+    async memorizedAuth(): Promise<any>{
+        const logged = await this.database.memorizedAuth()
+        return logged
+    }
 }

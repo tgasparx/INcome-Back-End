@@ -20,6 +20,8 @@ import { Companies } from "./Models/company.entity"
 
 
 export default interface IDatabase{
+    memorizedAuth: () => Promise<any>
+
     getCompanyIdByToken: (token: string) => Promise<string | "">
     listAllCompanies: () => Promise<Companies[] | false>
     createCompany: (companyData: ICompanyData) => Promise<boolean>

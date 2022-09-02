@@ -36,6 +36,8 @@ import IListCompanyEmployeesUseCase from "../useCases/IListCompanyEmployeesUseCa
 import IListCompanyEmployeesController from "./IListCompanyEmployeesController";
 import IChangePasswordUseCase from "../useCases/IChangePasswordUseCase";
 import IChangePasswordController from "./IChangePasswordController";
+import MemorizedAuthCompanyController from "./MemorizedAuthCompanyController";
+import MemorizedAuthCompanyUseCase from "../useCases/MemorizedAuthCompanyUseCase";
 
 const database: IDatabase = new Database()
 // START COMPANIES
@@ -67,4 +69,7 @@ export const listCompanyEmployeesController: IListCompanyEmployeesController = n
 
 const changePasswordUseCase: IChangePasswordUseCase = new ChangePasswordUseCase(companiesRepository)
 export const changePasswordController: IChangePasswordController = new ChangePasswordController(changePasswordUseCase)
+
+const memorizedAuthCompanyUseCase = new MemorizedAuthCompanyUseCase(companiesRepository)
+export const memorizedAuthCompanyController = new MemorizedAuthCompanyController(memorizedAuthCompanyUseCase)
 // END COMPANIES

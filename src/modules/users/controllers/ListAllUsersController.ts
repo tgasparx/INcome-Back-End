@@ -15,7 +15,7 @@ export default class ListAllUsersController implements IListAllUsersController{
             return response.json(users)
         }else{
             response.status(400)
-            return response.send("Ocorreu um erro")
+            return response.send("Não foram encontrados motoristas")
         }
     }
 }

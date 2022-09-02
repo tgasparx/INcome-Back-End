@@ -14,10 +14,10 @@ export default class EditOrderController implements IEditOrderController {
         const edited = await this.editOrderUseCase.execute({ description, value, status, client, driver, km }, orderId, token)
        if(edited){
         response.status(202)
-        return response.json(edited)
+        return response.send("Companhia editada com sucesso")
        }else{
         response.status(406)
-        response.send("Houve um erro interno")
+        response.send("Pedido não encontrado ou companhia não existente")
        }
         
     }

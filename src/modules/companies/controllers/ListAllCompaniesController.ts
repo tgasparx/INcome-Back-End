@@ -16,7 +16,7 @@ export default class ListAllCompaniesController implements IListAllCompaniesCont
             return response.json(created)
         }else{
             response.status(400)
-            response.send("Ocorreu um erro interno")
+            response.send("Não foram encontradas companhias")
         }
         
     }

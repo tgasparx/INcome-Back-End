@@ -11,6 +11,12 @@ export default class DeleteExpenseController implements IDeleteExpenseController
         const {expenseId} = request.body
         const {token} = request.params
         const deleted = await this.deleteExpenseUseCase.execute(expenseId, token)
-        return response.json(deleted)
+        if(deleted){
+            response.status(200)
+            return response.send("Despesa deletada com sucesso")
+        }else{
+            response.status(406)
+            return response.send("Despesa não encontrada ou a companhia não existente")
+        }
     }
 }

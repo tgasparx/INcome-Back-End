@@ -12,6 +12,12 @@ export default class DeleteOrderController implements IDeleteOrderController {
         const { orderId } = request.body
         const { token } = request.params
         const deleted = await this.deleteOrderUseCase.execute(orderId, token)
-        return response.json(deleted)
+        if(deleted){
+            response.status(200)
+            return response.send("Pedido deletado com sucesso")
+        }else{
+            response.status(400)
+            return response.send("Pedido não encontradi")
+        }
     }
 }

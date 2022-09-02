@@ -13,6 +13,12 @@ export default class UserEditController implements IUserEditController{
         const {token, userId} = request.params
         const {name, email, password, cpf} = request.body
         const edited = await this.userEditUseCase.execute({name, email, password, cpf}, token, userId)
-        return response.json(edited)
+        if(edited){
+            response.status(202)
+            return response.send("Usuário editado com sucesso")
+        }else{
+            response.status(406)
+            return response.send("Companhia não encontrada")
+        }
     }
 }

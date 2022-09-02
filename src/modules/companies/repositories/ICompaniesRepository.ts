@@ -19,4 +19,5 @@ export interface ICompaniesRepository{
     deleteCompany: (token: string, password: string) => Promise<any>
     companyData: (token: string) => Promise<ICompany | false>
     changePassword: ({ password, newPassword }: any, token: string) => Promise<boolean>
+    memorizedAuth: () => Promise<any>
 }

@@ -12,6 +12,12 @@ this.createExpenseUseCase = createExpenseUseCase
         const {token} = request.params
         const {status, value, description} = request.body
         const created = await this.createExpenseUseCase.execute({status, value, description}, token)
-        return response.json(created)
+        if(created){
+            response.status(201)
+            return response.send("Despesa criada com sucesso")
+        }else{
+            response.status(406)
+            return response.send("Houve um erro interno")
+        }
     }
 }

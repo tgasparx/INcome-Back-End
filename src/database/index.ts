@@ -33,6 +33,10 @@ import IEditUserData from "../modules/users/models/IEditUserData";
 export default class Database implements IDatabase {
   constructor() {
   }
+  async memorizedAuth(): Promise<any>{
+    
+    return false
+  }
 
   // START COMPANIES
   async getCompanyIdByToken(token: string): Promise<string | ""> {
@@ -54,8 +58,12 @@ export default class Database implements IDatabase {
     try {
       const companies: Companies[] = await myDataSource
         .getRepository(Companies).find()
-
-      return companies
+      if(companies[0]){
+        return companies
+      }else{
+        return false
+      }
+   
 
     } catch (error) {
       console.log(error)
@@ -193,7 +201,6 @@ export default class Database implements IDatabase {
           console.log("token", token, companyId, password)
           const deleted = await myDataSource.getRepository(Companies).createQueryBuilder().delete().from(Companies).where("id = :id", { id: `${companyId}` })
             .execute()
-          console.log("deleted", deleted)
           return true
         } else {
           return false
@@ -365,8 +372,8 @@ export default class Database implements IDatabase {
     const companyId = await this.getCompanyIdByToken(token)
     if (companyId) {
       try {
-        const deleted = await myDataSource.getRepository(Expense).createQueryBuilder().delete().from(Order).where("expense_id = :id", { id: Like(`${expenseId}`) })
-          .execute()
+        const deleted = await myDataSource.getRepository(Expense).createQueryBuilder().delete().from(Expense).where("expense_id = :id", { id: `${expenseId}` })
+        .execute()
         return true
       } catch (error) {
         return false
@@ -445,8 +452,8 @@ export default class Database implements IDatabase {
     const companyId = await this.getCompanyIdByToken(token)
     if (companyId) {
       try {
-        const deleted = await myDataSource.getRepository(Order).createQueryBuilder().delete().from(Order).where("order_id = :id", { id: Like(`${orderId}`) })
-          .execute()
+        const deleted = await myDataSource.getRepository(Order).createQueryBuilder().delete().from(Order).where("order_id = :id", { id: `${orderId}` })
+        .execute()
         return true
       } catch (error) {
         return false
@@ -510,14 +517,33 @@ export default class Database implements IDatabase {
 
   }
   async editUser({ name, email, password, cpf }: IEditUserData, token: string, userId: string): Promise<boolean> {
-    try {
-      const companyIdByToken = await this.getCompanyIdByToken(token)
-      const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, email, password, cpf }).where("id = :id", { id: userId })
-        .execute()
-    } catch (error) {
+    const companyIdByToken = await this.getCompanyIdByToken(token)
+    if(companyIdByToken){
+      try {
+        const isEmailAlreadyExists = await myDataSource.getRepository(Users).findBy({email: Like(`${email}`)})
+        console.log(isEmailAlreadyExists)
+        const isCpfAlreadyExists = await myDataSource.getRepository(Users).findBy({cpf: Like(`${cpf}`)})
+        console.log(isCpfAlreadyExists)
+        if(isEmailAlreadyExists[0] && isCpfAlreadyExists[0]){
+          const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, password }).where("id = :id", { id: userId })
+          .execute()
+          return true
+        }else if(isEmailAlreadyExists[0]){
+          const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, password, cpf }).where("id = :id", { id: userId })
+          .execute()
+          return true
+        }else if(isCpfAlreadyExists[0]){
+          const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, email,password }).where("id = :id", { id: userId })
+          .execute()
+          return true
+        }
+   
+      } catch (error) {
+        return false
+      }
+    }else{
       return false
     }
-    return true
   }
   async userAuth({ email, password }): Promise<IUserAuthResponse | false> {
     const referedUser = await myDataSource
@@ -622,7 +648,8 @@ export default class Database implements IDatabase {
   }
   async deleteUser(token: string, userId: string): Promise<boolean> {
     const companyIdByToken: string | "" = await this.getCompanyIdByToken(token)
-    if (companyIdByToken) {
+    const isUserWithSelectedOrder = await myDataSource.getRepository(Order).findBy({driver: Like(`${userId}`)})
+    if (companyIdByToken && !isUserWithSelectedOrder[0]) {
       try {
 
         const deleted = await myDataSource.getRepository(Users).createQueryBuilder().delete().from(Users).where("id = :id", { id: `${userId}` })

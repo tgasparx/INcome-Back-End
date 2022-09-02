@@ -3,7 +3,7 @@ import express, {Request, Response} from 'express'
 import cors from 'cors'
 import { companiesRoutes } from './routes/companies.routes'
 import { usersRoutes } from './routes/users.routes'
-import { changePasswordController, companyAuthController, companyDataController, companyEditController, companySummaryController, createNewCompanyController, deleteCompanyController, listAllCompaniesController, listCompanyEmployeesController } from './modules/companies/controllers'
+import { changePasswordController, companyAuthController, companyDataController, companyEditController, companySummaryController, createNewCompanyController, deleteCompanyController, listAllCompaniesController, listCompanyEmployeesController, memorizedAuthCompanyController } from './modules/companies/controllers'
 import { myDataSource } from './database/config/app-data-source'
 import {Users } from './database/Models/user.entity'
 import { Companies } from './database/Models/company.entity'
@@ -42,8 +42,8 @@ companiesRoutes.post("/create", async function (request: Request, response: Resp
 companiesRoutes.post("/auth", async function (request: Request, response: Response): Promise<Response> {
     return await companyAuthController.handle(request, response) 
  })
- companiesRoutes.post("/memorizedAuth/:token", async function(request: Request, response: Response): Promise<Response>{
-   return response.send(request.params)
+ companiesRoutes.post("/memorizedAuthCompanies/:memorizedToken", async function(request: Request, response: Response): Promise<Response>{
+   return await memorizedAuthCompanyController.handle(request, response)
  })
  companiesRoutes.patch("/edit/:token", async function (request: Request, response: Response): Promise<Response>{
     return await companyEditController.handle(request,response)
@@ -74,7 +74,7 @@ companiesRoutes.put("/changePassword/:token", async function(request: Request, r
  usersRoutes.post("/auth", async function(request: Request, response: Response): Promise<Response>{
     return await userAuthController.handle(request,response)
  })
- usersRoutes.post("/memorizedAuth/:token", async function(request: Request, response: Response): Promise<Response>{
+ usersRoutes.post("/memorizedAuthUsers/:memorizedToken", async function(request: Request, response: Response): Promise<Response>{
    return response.send(request.params)
  })
  usersRoutes.patch("/edit/:token/:userId", async function(request: Request, response: Response): Promise<Response>{

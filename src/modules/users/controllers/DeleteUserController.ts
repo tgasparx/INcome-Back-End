@@ -15,7 +15,7 @@ export default class DeleteUserController implements IDeleteUserController{
             return response.send("Motorista deletado com sucesso")
         }else{
             response.status(406)
-            return response.send("Motorista não encontrado, ou acesso não permitido")
+            return response.send("Motorista não encontrado, ou o motorista possui pedidos assinados, ou acesso não permitido")
         }
         
     }

@@ -12,6 +12,12 @@ export default class EditExpensesController implements IEditExpensesController{
         const {description, value, status, expenseId} = request.body
         const {token} = request.params
         const edited = await this.editExpensesUseCase.execute({description, value, status}, expenseId, token)
-        return response.json(edited)
+        if(edited){
+            response.status(202)
+            return response.send("Despesa editada com sucesso")
+        }else{
+            response.status(406)
+            return response.send("Houve um erro interno")
+        }
     }
 }
