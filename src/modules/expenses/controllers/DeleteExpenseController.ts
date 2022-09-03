@@ -8,8 +8,7 @@ export default class DeleteExpenseController implements IDeleteExpenseController
         this.deleteExpenseUseCase = deleteExpenseUseCase
     }
     async handle(request: Request, response: Response): Promise<Response>{
-        const {expenseId} = request.body
-        const {token} = request.params
+        const {expenseId, token} = request.params
         const deleted = await this.deleteExpenseUseCase.execute(expenseId, token)
         if(deleted){
             response.status(200)

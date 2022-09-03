@@ -100,7 +100,7 @@ companiesRoutes.put("/changePassword/:token", async function(request: Request, r
  ordersRoutes.patch("/edit/:token", async function(request: Request, response: Response): Promise<Response>{
    return await editOrderController.handle(request, response)
  })
- ordersRoutes.delete("/delete/:token", async function (request: Request, response: Response): Promise<Response>{
+ ordersRoutes.delete("/delete/:orderId/:token", async function (request: Request, response: Response): Promise<Response>{
    return await deleteOrderController.handle(request, response)
  })
          //END ORDERS
@@ -111,10 +111,10 @@ companiesRoutes.put("/changePassword/:token", async function(request: Request, r
  expensesRoutes.post("/create/:token", async function(request: Request, response: Response): Promise<Response>{
    return await createExpenseController.handle(request, response)
  })
- expensesRoutes.patch("/edit/:token", async function (request: Request, response: Response): Promise<Response>{
+ expensesRoutes.patch("/edit/:expenseId/:token", async function (request: Request, response: Response): Promise<Response>{
    return await editExpensesController.handle(request, response)
  })
- expensesRoutes.delete("/delete/:token", async function(request: Request, response: Response): Promise<Response>{
+ expensesRoutes.delete("/delete/:expenseId/:token", async function(request: Request, response: Response): Promise<Response>{
    return await deleteExpenseController.handle(request,response)
  })
          //END EXPENSES

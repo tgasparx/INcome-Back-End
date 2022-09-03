@@ -9,9 +9,10 @@ export default class EditExpensesController implements IEditExpensesController{
         this.editExpensesUseCase = editExpensesUseCase
     }
     async handle(request: Request, response: Response): Promise<Response>{
-        const {description, value, status, expenseId} = request.body
-        const {token} = request.params
+        const {description, value, status} = request.body
+        const {expenseId, token} = request.params
         const edited = await this.editExpensesUseCase.execute({description, value, status}, expenseId, token)
+        // return response.json({description, value, status, expenseId, token})
         if(edited){
             response.status(202)
             return response.send("Despesa editada com sucesso")

@@ -34,7 +34,7 @@ export default class UsersRepository implements IUsersRepository {
         const summary = await this.database.userSummary(token)
         return summary
     }
-    async userData(token: string): Promise<IUser | false>{
+    async userData(token: string): Promise<IUserAuthResponse | false>{
         const userData = await this.database.userData(token)
         return userData
     }

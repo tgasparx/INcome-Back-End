@@ -9,8 +9,7 @@ export default class DeleteOrderController implements IDeleteOrderController {
         this.deleteOrderUseCase = deleteOrderUseCase
     }
     async handle(request: Request, response: Response): Promise<Response> {
-        const { orderId } = request.body
-        const { token } = request.params
+        const {  token, orderId } = request.params
         const deleted = await this.deleteOrderUseCase.execute(orderId, token)
         if(deleted){
             response.status(200)
@@ -19,5 +18,6 @@ export default class DeleteOrderController implements IDeleteOrderController {
             response.status(400)
             return response.send("Pedido não encontradi")
         }
+    
     }
 }

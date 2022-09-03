@@ -34,7 +34,7 @@ export default class Database implements IDatabase {
   constructor() {
   }
   async memorizedAuth(): Promise<any>{
-    
+
     return false
   }
 
@@ -42,7 +42,7 @@ export default class Database implements IDatabase {
   async getCompanyIdByToken(token: string): Promise<string | ""> {
     try {
       const referedCompanyIdByToken: CompanyAuth[] = await myDataSource.getRepository(CompanyAuth).findBy({ token: Like(`${token}`) })
-      console.log("loggedCompanyId", referedCompanyIdByToken)
+      console.log("loggedCompanyId", referedCompanyIdByToken[0])
       if (referedCompanyIdByToken.length !== 0) {
         const companyId = referedCompanyIdByToken[0].company
         return companyId
@@ -331,11 +331,11 @@ export default class Database implements IDatabase {
 
   }
   async editExpense({ description, value, status }: IEditExpenseData, expenseId: string, token: string): Promise<boolean> {
-    const userId = this.getUserIdByToken(token)
-    if (userId) {
+    const companyIdByToken = await this.getCompanyIdByToken(token)
+    if (companyIdByToken) {
       try {
-        const edited = await myDataSource.getRepository(Expense).createQueryBuilder().update(Expense).set({ description, value, status }).where("expense_id = :id", { id: expenseId })
-          .execute()
+        const edited = await myDataSource.getRepository(Expense).createQueryBuilder().update(Expense).set({ description, value, status}).where("expense_id = :id", { id: expenseId })
+        .execute()
         return true
       } catch (error) {
         return false
@@ -518,6 +518,7 @@ export default class Database implements IDatabase {
   }
   async editUser({ name, email, password, cpf }: IEditUserData, token: string, userId: string): Promise<boolean> {
     const companyIdByToken = await this.getCompanyIdByToken(token)
+    console.log("token",token, companyIdByToken , "name", name, email, password, cpf)
     if(companyIdByToken){
       try {
         const isEmailAlreadyExists = await myDataSource.getRepository(Users).findBy({email: Like(`${email}`)})
@@ -528,12 +529,16 @@ export default class Database implements IDatabase {
           const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, password }).where("id = :id", { id: userId })
           .execute()
           return true
-        }else if(isEmailAlreadyExists[0]){
+        }else if(isEmailAlreadyExists[0] && !isCpfAlreadyExists[0]){
           const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, password, cpf }).where("id = :id", { id: userId })
           .execute()
           return true
-        }else if(isCpfAlreadyExists[0]){
+        }else if(isCpfAlreadyExists[0] && !isEmailAlreadyExists[0]){
           const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, email,password }).where("id = :id", { id: userId })
+          .execute()
+          return true
+        }else if(!isCpfAlreadyExists[0] && !isEmailAlreadyExists[0]){
+          const edited = await myDataSource.getRepository(Users).createQueryBuilder().update(Users).set({ name, email,password, cpf }).where("id = :id", { id: userId })
           .execute()
           return true
         }
@@ -564,6 +569,8 @@ export default class Database implements IDatabase {
           const isAuthResponse = {
             id: referedUser[0].id,
             name: referedUser[0].name,
+            cpf: referedUser[0].cpf,
+            job: "Motorista",
             email: referedUser[0].email,
             created_at: referedUser[0].created_at,
             token: {
@@ -610,6 +617,7 @@ export default class Database implements IDatabase {
       try {
         const userOrders = await myDataSource.getRepository(Order).findBy({ driver: Like(`${userId}`) })
         console.log(userOrders)
+        const userData = await myDataSource.getRepository(Users).findBy({id: Like(`${userId}`)})
         let totalKm: number = 0
         for (let i = 0; i < userOrders.length; i++) {
           totalKm = totalKm + userOrders[i].km
@@ -618,9 +626,11 @@ export default class Database implements IDatabase {
         //     return prev.km + curr.km 
         //  })
         const templateSummary = {
+          user_name: userData[0].name,
+          user_job: "Motorista",
           total_km: totalKm,
           total_pedidos: userOrders.length,
-          total_pedidos_finalizados: userOrders.filter((e) => e.status === "Concluída").length
+          total_pedidos_finalizados: userOrders.filter((e) => e.status === "Concluido").length
         }
         return templateSummary
       } catch (error) {
@@ -630,13 +640,25 @@ export default class Database implements IDatabase {
       return false
     }
   }
-  async userData(token: string): Promise<IUser | false> {
+  async userData(token: string): Promise<IUserAuthResponse | false> {
     const userIdByToken = await this.getUserIdByToken(token)
     if (userIdByToken) {
       try {
 
         const userData = await myDataSource.getRepository(Users).findBy({ id: Like(`${userIdByToken}`) })
-        return userData[0]
+        const isAuthResponse = {
+          id: userData[0].id,
+          name: userData[0].name,
+          cpf: userData[0].cpf,
+          job: "Motorista",
+          email: userData[0].email,
+          created_at: userData[0].created_at,
+          token: {
+            type: "Bearer",
+            tokenHash: token
+          }
+        }
+          return isAuthResponse
       } catch (error) {
         return false
       }
